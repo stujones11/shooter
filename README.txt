@@ -32,7 +32,7 @@ Crafting
 
 S = Steel Ingot  [default:steel_ingot]
 B = Bronze Ingot [default:bronze_ingot]
-M = Mese Crystal [default:mese_crysytal]
+M = Mese Crystal [default:mese_crystal]
 
 Pistol: [shooter:pistol]
 
