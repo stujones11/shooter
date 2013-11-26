@@ -1,0 +1,12 @@
+Minetest Mod - Simple Shooter [shooter]
+=======================================
+
+License Source: 2013 Stuart Jones - LGPL
+
+License Textures: Stuart Jones - WTFPL
+
+License Sounds: freesound.org
+
+	flobert1_20070728.wav by Nonoo - Attribution 3.0 Unported (CC BY 3.0)	
+	GUNSHOT.WAV by erkanozan - CC0 1.0 Universal (CC0 1.0)
+
