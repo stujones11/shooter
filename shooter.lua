@@ -1,7 +1,7 @@
 shooter = {}
 
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
-SHOOTER_ALLOW_ENTITIES = true
+SHOOTER_ALLOW_ENTITIES = false
 SHOOTER_OBJECT_RANGE = 50
 
 local modpath = minetest.get_modpath(minetest.get_current_modname())
