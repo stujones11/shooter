@@ -1,38 +1,37 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.1.0
+Mod Version: 0.2.0
 
 Minetest Version: 0.4.8
 
 Depends: default
 
-An experimental first person shooter mod using vector mathematics instead of
-physical projectile entities. This has a number of advantages along with a
-number disadvantages.
+An experimental first person shooter mod using simple vector mathematics
+in an effort to find a more server-firendly method of hit detection from
+that which is currently being used by the firearms mod.
 
-Pros:
+For the most part I think I have achieved this for straight pvp, however,
+the jury is still out as to whether it is any faster against entities (mobs)
+One big downside of this method is that it only works against ordinary nodes
+within pointable range of the player.
 
-Fast and responsive
-Fairly light weight
-Not affected by chunk boundaries
+By default this mod is configured to work only against other players in
+multiplayer (server) mode. This is overridden in singleplayer mode to work
+against all registered entities instead.
 
-Cons:
+Default configuration can be customised by adding a shooter.conf file to the
+mod's main directory, see shooter.conf.example for more details.
 
-Only works against other players
-Slightly less realistic
-
-This is still very much a work in progress and currently not much use in a
-singleplayer game. I plan to eventually use this as a base for a 'Spades' style
-FPS game using the minetest engine, however, I decided to add a couple of craft
-recipes and release this simple version for minetest_game.
+This is still very much a work in progress which I plan to eventually use as
+the base for a 'Spades' style FPS game using the minetest engine.
 
 Crafting
 ========
 
 S = Steel Ingot  [default:steel_ingot]
 B = Bronze Ingot [default:bronze_ingot]
-M = Mese Crystal [default:mese_crystal]
+M = Mese Crystal [default:mese_crysytal]
 
 Pistol: [shooter:pistol]
 
@@ -48,6 +47,16 @@ Riffle: [shooter:riffle]
 | S |   |   |
 +---+---+---+
 |   | B |   |
++---+---+---+
+|   | M | B |
++---+---+---+
+
+Shotgun: [shooter:shotgun]
+
++---+---+---+
+| S |   |   |
++---+---+---+
+|   | S |   |
 +---+---+---+
 |   | M | B |
 +---+---+---+

@@ -7,6 +7,9 @@ License Textures: Stuart Jones - WTFPL
 
 License Sounds: freesound.org
 
-	flobert1_20070728.wav by Nonoo - Attribution 3.0 Unported (CC BY 3.0)	
+	flobert1_20070728.wav by Nonoo - Attribution 3.0 Unported (CC BY 3.0)
+	
+	shot.wav by Sergenious -  Attribution 3.0 Unported (CC BY 3.0)
+
 	GUNSHOT.WAV by erkanozan - CC0 1.0 Universal (CC0 1.0)
 

@@ -1,0 +1,13 @@
+-- Simple Shooter config example
+
+-- Global Constants (defaults)
+
+-- Particle texture used when target it hit
+SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
+
+-- Allow entities in multiplayer mode
+SHOOTER_ALLOW_ENTITIES = false
+
+-- Maximum object range, applies only if entities are allowed
+SHOOTER_OBJECT_RANGE = 50
+
