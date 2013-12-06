@@ -12,6 +12,7 @@ minetest.register_tool("shooter:pistol", {
 			particle = "default_obsidian.png",
 		})
 		itemstack:add_wear(328) -- 200 Rounds
+		return itemstack
 	end,
 })
 
