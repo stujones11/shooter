@@ -7,7 +7,7 @@ minetest.register_tool("shooter:pistol", {
 		shooter:fire_weapon(user, pointed_thing, {
 			range = 30,
 			tool_caps = {full_punch_interval=0.5, damage_groups={fleshy=1}},
-			groups = {snappy=3, oddly_breakable_by_hand=3},
+			groups = {snappy=3, fleshy=3, oddly_breakable_by_hand=3},
 			sound = "shooter_pistol",
 			particle = "default_obsidian.png",
 		})
@@ -23,7 +23,7 @@ minetest.register_tool("shooter:riffle", {
 		shooter:fire_weapon(user, pointed_thing, {
 			range = 80,
 			tool_caps = {full_punch_interval=1.0, damage_groups={fleshy=2}},
-			groups = {snappy=3, crumbly=3, choppy=3, oddly_breakable_by_hand=2},
+			groups = {snappy=3, crumbly=3, choppy=3, fleshy=2, oddly_breakable_by_hand=2},
 			sound = "shooter_riffle",
 			particle = "default_gold_block.png",
 		})
@@ -39,7 +39,7 @@ minetest.register_tool("shooter:shotgun", {
 		shooter:fire_weapon(user, pointed_thing, {
 			range = 15,
 			tool_caps = {full_punch_interval=1.5, damage_groups={fleshy=4}},
-			groups = {cracky=3, snappy=2, crumbly=2, choppy=2, oddly_breakable_by_hand=1},
+			groups = {cracky=3, snappy=2, crumbly=2, choppy=2, fleshy=1, oddly_breakable_by_hand=1},
 			sound = "shooter_shotgun",
 			particle = "smoke_puff.png",
 		})
