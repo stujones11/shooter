@@ -1,7 +1,9 @@
 shooter = {}
 
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
+SHOOTER_ALLOW_NODES = true
 SHOOTER_ALLOW_ENTITIES = false
+SHOOTER_NODE_RANGE = 50
 SHOOTER_OBJECT_RANGE = 50
 
 local modpath = minetest.get_modpath(minetest.get_current_modname())
@@ -44,6 +46,36 @@ local function is_valid_object(object)
 	return false
 end
 
+local function punch_node(pos, def)
+	local node = minetest.get_node(pos)
+	if not node then
+		return
+	end
+	local item = minetest.registered_items[node.name]
+	if not item.groups then
+		return
+	end
+	for k, v in pairs(def.groups) do
+		local level = item.groups[k] or 0
+		if level >= v then
+			minetest.remove_node(pos)
+			local sounds = item.sounds
+			if sounds then
+				local soundspec = sounds.dug
+				if soundspec then
+					soundspec.pos = pos
+					minetest.sound_play(soundspec.name, soundspec)
+				end
+			end
+			local tiles = item.tiles
+			if tiles then
+				return tiles[1]
+			end
+			break
+		end
+	end
+end
+
 function shooter:fire_weapon(user, pointed_thing, def)
 	local name = user:get_player_name()
 	if shots[name] then
@@ -60,37 +92,12 @@ function shooter:fire_weapon(user, pointed_thing, def)
 		{x=0, y=0, z=0}, 0.5, 0.25,
 		false, def.particle
 	)
-	if pointed_thing.type == "node" then
+	if pointed_thing.type == "node" and SHOOTER_ALLOW_NODES == true then
 		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
-		local node = minetest.get_node(pos)
-		if not node then
-			return
-		end
-		local item = minetest.registered_items[node.name]
-		if not item.groups then
-			return
-		end
-		for k, v in pairs(def.groups) do
-			local level = item.groups[k] or 0
-			if level >= v then
-				minetest.remove_node(pos)
-				local sounds = item.sounds
-				if sounds then
-					local soundspec = sounds.dug
-					if soundspec then
-						soundspec.pos = pos
-						minetest.sound_play(soundspec.name, soundspec)
-					end
-				end
-				local tiles = item.tiles
-				if tiles then
-					if tiles[1] then
-						spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
-						v1, vector.distance(p1, pos), tiles[1])
-					end
-				end
-				break
-			end
+		local texture = punch_node(pos, def)
+		if texture then
+			spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
+			v1, vector.distance(p1, pos), texture)
 		end
 		return
 	elseif pointed_thing.type == "object" then
@@ -141,20 +148,40 @@ function shooter:fire_weapon(user, pointed_thing, def)
 						target = {
 							object = object,
 							distance = x,
-							direction = v1,
-							pos1 = {x=p1.x, z=p1.z, y=p1.y+1},
-							pos2 = {x=p2.x, z=p2.z, y=p2.y+1.75},
+							pos = {x=p2.x, z=p2.z, y=p2.y+1.75},
 						}
 					end
 				end
 			end
 		end
 	end
+	local view_pos = {x=p1.x, y=p1.y + 1.75, z=p1.z}
 	if target.object then
-		if minetest.line_of_sight(target.pos1, target.pos2, 1) then
-			target.object:punch(user, nil, def.tool_caps, target.direction)
-			spawn_particles(target.pos1, target.direction,
+		local success, pos = minetest.line_of_sight(view_pos, target.pos, 1)
+		if success then
+			target.object:punch(user, nil, def.tool_caps, v1)
+			spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z}, v1,
 			target.distance, SHOOTER_EXPLOSION_TEXTURE)
+		elseif pos and SHOOTER_ALLOW_NODES == true then
+			local texture = punch_node(pos, def)
+			if texture then
+				spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
+				v1, vector.distance(p1, pos), texture)
+			end
+		end
+	elseif SHOOTER_ALLOW_NODES == true then
+		local d = def.range
+		if d > SHOOTER_NODE_RANGE then
+			d = SHOOTER_NODE_RANGE
+		end
+		local p2 = vector.add(view_pos, vector.multiply(v1, {x=d, y=d, z=d}))
+		local success, pos = minetest.line_of_sight(view_pos, p2, 1)
+		if pos then
+			local texture = punch_node(pos, def)
+			if texture then
+				spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
+				v1, vector.distance(p1, pos), texture)
+			end
 		end
 	end
 end

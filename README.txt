@@ -1,9 +1,9 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.2.0
+Mod Version: 0.3.0
 
-Minetest Version: 0.4.8
+Minetest Version: 0.4.8-dev d9ef072305
 
 Depends: default
 
@@ -13,8 +13,6 @@ that which is currently being used by the firearms mod.
 
 For the most part I think I have achieved this for straight pvp, however,
 the jury is still out as to whether it is any faster against entities (mobs)
-One big downside of this method is that it only works against ordinary nodes
-within pointable range of the player.
 
 By default this mod is configured to work only against other players in
 multiplayer (server) mode. This is overridden in singleplayer mode to work

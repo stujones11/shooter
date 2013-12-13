@@ -5,6 +5,12 @@
 -- Particle texture used when target it hit
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
 
+-- Allow node destruction
+SHOOTER_ALLOW_NODES = true
+
+-- Maximum node rage, applies only if nodes are allowed
+SHOOTER_NODE_RANGE = 50
+
 -- Allow entities in multiplayer mode
 SHOOTER_ALLOW_ENTITIES = false
 
