@@ -127,10 +127,10 @@ function shooter:fire_weapon(user, pointed_thing, def)
 				p2.y = p2.y - 0.75
 				if x > 0 and x < target.distance and x < def.range then
 					local yx = 0
-					if x > 50 then
+					if x > 30 then
 						yx = 0.001 * (10 - x * 0.1)
 					else
-						yx = 0.000015 * (x * x) - 0.0015 * x + 0.042
+						yx = 0.00002 * (x * x) - 0.002 * x + 0.05
 					end
 					local yy = yx * 3
 					local v2 = vector.normalize(vector.direction(p1, p2))
