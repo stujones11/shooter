@@ -20,6 +20,9 @@ local timer = 0
 local shots = {}
 
 local function spawn_particles(p, v, d, texture)
+	if texture.type ~= "string" then
+		texture = SHOOTER_EXPLOSION_TEXTURE
+	end
 	local pos = vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
 	pos.y = pos.y + 0.75
 	local spread = {x=0.1, y=0.1, z=0.1}
