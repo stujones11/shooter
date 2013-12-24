@@ -18,7 +18,7 @@ local timer = 0
 local shots = {}
 
 local function spawn_particles(p, v, d, texture)
-	if texture.type ~= "string" then
+	if type(texture) ~= "string" then
 		texture = SHOOTER_EXPLOSION_TEXTURE
 	end
 	local pos = vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
@@ -70,29 +70,31 @@ function shooter:fire_weapon(user, pointed_thing, def)
 			return
 		end
 		local item = minetest.registered_items[node.name]
-		if not item.groups then
+		if not item then
 			return
 		end
-		for k, v in pairs(def.groups) do
-			local level = item.groups[k] or 0
-			if level >= v then
-				minetest.remove_node(pos)
-				local sounds = item.sounds
-				if sounds then
-					local soundspec = sounds.dug
-					if soundspec then
-						soundspec.pos = pos
-						minetest.sound_play(soundspec.name, soundspec)
+		if item.groups then
+			for k, v in pairs(def.groups) do
+				local level = item.groups[k] or 0
+				if level >= v then
+					minetest.remove_node(pos)
+					local sounds = item.sounds
+					if sounds then
+						local soundspec = sounds.dug
+						if soundspec then
+							soundspec.pos = pos
+							minetest.sound_play(soundspec.name, soundspec)
+						end
 					end
-				end
-				local tiles = item.tiles
-				if tiles then
-					if tiles[1] then
-						spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
-						v1, vector.distance(p1, pos), tiles[1])
+					local tiles = item.tiles
+					if tiles then
+						if tiles[1] then
+							spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
+							v1, vector.distance(p1, pos), tiles[1])
+						end
 					end
+					break
 				end
-				break
 			end
 		end
 		return
