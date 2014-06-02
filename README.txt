@@ -1,28 +1,21 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.3.0
+Mod Version: 0.4.0
 
-Minetest Version: 0.4.8-dev d9ef072305
+Minetest Version: 0.4.9
 
-Depends: default
-
-An experimental first person shooter mod using simple vector mathematics
-in an effort to find a more server-firendly method of hit detection from
-that which is currently being used by the firearms mod.
-
-For the most part I think I have achieved this for straight pvp, however,
-the jury is still out as to whether it is any faster against entities (mobs)
+An experimental first person shooter mod that uses simple vector mathematics
+to produce an accurate and server-firendly method of hit detection.
 
 By default this mod is configured to work only against other players in
-multiplayer (server) mode. This is overridden in singleplayer mode to work
-against all registered entities instead.
+multiplayer mode and against Simple Mobs [mobs] in singleplayer mode.
 
-Default configuration can be customised by adding a shooter.conf file to the
-mod's main directory, see shooter.conf.example for more details.
+Default configuration can be customised by adding a shooter.conf file to
+the mod's main directory, see shooter.conf.example for more details.
 
-This is still very much a work in progress which I plan to eventually use as
-the base for a 'Spades' style FPS game using the minetest engine.
+This is still very much a work in progress which I eventually plan to use
+as the base for a 'Spades' style FPS game using the minetest engine.
 
 Crafting
 ========
@@ -34,7 +27,7 @@ M = Mese Crystal [default:mese_crysytal]
 Pistol: [shooter:pistol]
 
 +---+---+
-| S | B |
+| S | S |
 +---+---+
 |   | M |
 +---+---+
@@ -57,5 +50,15 @@ Shotgun: [shooter:shotgun]
 |   | S |   |
 +---+---+---+
 |   | M | B |
++---+---+---+
+
+Sub Machine Gun: [shooter:machine_gun]
+
++---+---+---+
+| S | S | S |
++---+---+---+
+|   | B | M |
++---+---+---+
+|   | B |   |
 +---+---+---+
 
