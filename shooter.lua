@@ -55,7 +55,10 @@ local function punch_node(pos, def)
 		return
 	end
 	local item = minetest.registered_items[node.name]
-	if item and item.groups then
+	if not item then
+		return
+	end
+	if item.groups then
 		for k, v in pairs(def.groups) do
 			local level = item.groups[k] or 0
 			if level >= v then
