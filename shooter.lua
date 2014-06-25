@@ -5,6 +5,7 @@ shooter = {
 	shots = {},
 }
 
+SHOOTER_ENABLE_PARTICLE_FX = true
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
 SHOOTER_ALLOW_NODES = true
 SHOOTER_ALLOW_ENTITIES = false
@@ -51,13 +52,15 @@ local function get_dot_product(v1, v2)
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 end
 
-local function spawn_particles(p, v, d, texture)
-	if p and v and d then
+local function get_particle_pos(p, v, d)
+	return vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
+end
+
+local function spawn_particles(pos, texture)
+	if SHOOTER_ENABLE_PARTICLE_FX == true then
 		if type(texture) ~= "string" then
 			texture = SHOOTER_EXPLOSION_TEXTURE
 		end
-		local pos = vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
-		pos.y = pos.y + 0.75
 		local spread = {x=0.1, y=0.1, z=0.1}
 		minetest.add_particlespawner(15, 0.3,
 			vector.subtract(pos, spread), vector.add(pos, spread),
@@ -125,8 +128,8 @@ local function process_round(round)
 	for _,ref in ipairs(shooter.objects) do
 		local p2 = vector.add(ref.pos, ref.offset)
 		if p1 and p2 and ref.name ~= round.name then
-			local x = vector.distance(p1, p2)
-			if x < round.def.step then
+			local d = vector.distance(p1, p2)
+			if d < round.def.step then
 				local n = vector.multiply(v1, {x=-1, y=0, z=-1})
 				local v2 = vector.subtract(p1, p2)
 				local r1 = get_dot_product(n, v2)
@@ -141,7 +144,7 @@ local function process_round(round)
 							math.abs(pd.z) < ref.collisionbox[6] then
 						target.object = ref.object
 						target.pos = pt
-						target.distance = x
+						target.distance = d
 					end
 				end
 			end
@@ -153,15 +156,14 @@ local function process_round(round)
 			local user = minetest.get_player_by_name(round.name)
 			if user then
 				target.object:punch(user, nil, round.def.tool_caps, v1)
-				spawn_particles({x=p1.x, y=p1.y - 1, z=p1.z}, v1,
-					target.distance, SHOOTER_EXPLOSION_TEXTURE)
+				spawn_particles(target.pos, SHOOTER_EXPLOSION_TEXTURE)
 			end
 			return 1
 		elseif pos and SHOOTER_ALLOW_NODES == true then
 			local texture = punch_node(pos, round.def)
 			if texture then
-				spawn_particles({x=p1.x, y=p1.y - 1, z=p1.z},
-					v1, vector.distance(p1, pos), texture)
+				local pp = get_particle_pos(p1, v1, vector.distance(p1, pos))
+				spawn_particles(pp, texture)
 			end
 			return 1
 		end
@@ -172,8 +174,8 @@ local function process_round(round)
 		if pos then
 			local texture = punch_node(pos, round.def)
 			if texture then
-				spawn_particles({x=p1.x, y=p1.y - 1, z=p1.z},
-					v1, vector.distance(p1, pos), texture)
+				local pp = get_particle_pos(p1, v1, vector.distance(p1, pos))
+				spawn_particles(pp, texture)
 			end
 			return 1
 		end
@@ -202,16 +204,18 @@ function shooter:fire_weapon(user, pointed_thing, def)
 		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
 		local texture = punch_node(pos, def)
 		if texture then
-			spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z},
-				v1, vector.distance(p1, pos), texture)
+			local pp = get_particle_pos(p1, v1, vector.distance(p1, pos))
+			pp.y = pp.y + 1.75
+			spawn_particles(pp, texture)
 		end
 	elseif pointed_thing.type == "object" then
 		local object = pointed_thing.ref
 		if is_valid_object(object) == true then
 			object:punch(user, nil, def.tool_caps, v1)
 			local p2 = object:getpos()
-			spawn_particles({x=p1.x, y=p1.y + 0.75, z=p1.z}, v1,
-				vector.distance(p1, p2), SHOOTER_EXPLOSION_TEXTURE)
+			local pp = get_particle_pos(p1, v1, vector.distance(p1, p2))
+			pp.y = pp.y + 1.75
+			spawn_particles(pp, SHOOTER_EXPLOSION_TEXTURE)
 		end
 	else
 		shooter:update_objects()

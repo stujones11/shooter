@@ -2,7 +2,10 @@
 
 -- Global Constants (defaults)
 
--- Particle texture used when a player or entity it hit
+-- Enable particle effects
+SHOOTER_ENABLE_PARTICLE_FX = true
+
+-- Particle texture used when a player or entity is hit
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
 
 -- Allow node destruction
