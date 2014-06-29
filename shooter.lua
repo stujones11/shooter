@@ -182,6 +182,45 @@ local function process_round(round)
 	end
 end
 
+function shooter:register_weapon(name, def)
+	local shots = def.shots or 1
+	local wear = math.ceil(65534 / def.rounds)
+	local max_wear = (def.rounds - 1) * wear
+	minetest.register_tool(name, {
+		description = def.description,
+		inventory_image = def.inventory_image,
+		on_use = function(itemstack, user, pointed_thing)
+			if itemstack:get_wear() < max_wear then
+				def.spec.name = user:get_player_name()
+				if shots > 1 then
+					local step = def.spec.tool_caps.full_punch_interval
+					for i = 0, step * (shots), step do
+						minetest.after(i, function()
+							shooter:fire_weapon(user, pointed_thing, def.spec)
+						end)
+					end
+				else
+					shooter:fire_weapon(user, pointed_thing, def.spec)
+				end
+				itemstack:add_wear(wear)
+			else
+				local inv = user:get_inventory()
+				if inv then
+					local stack = "shooter:ammo 1"
+					if inv:contains_item("main", stack) then
+						minetest.sound_play("shooter_reload", {object=user})
+						inv:remove_item("main", stack)
+						itemstack:replace(name.." 1 1")
+					else
+						minetest.sound_play("shooter_click", {object=user})
+					end
+				end
+			end
+			return itemstack
+		end,
+	})
+end
+
 function shooter:fire_weapon(user, pointed_thing, def)
 	if shooter.shots[def.name] then
 		if shooter.time < shooter.shots[def.name] then

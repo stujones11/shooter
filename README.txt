@@ -32,7 +32,7 @@ Pistol: [shooter:pistol]
 |   | M |
 +---+---+
 
-Riffle: [shooter:riffle]
+Rifle: [shooter:rifle]
 
 +---+---+---+
 | S |   |   |

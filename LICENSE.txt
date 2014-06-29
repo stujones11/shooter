@@ -13,3 +13,7 @@ License Sounds: freesound.org
 
 	GUNSHOT.WAV by erkanozan - CC0 1.0 Universal (CC0 1.0)
 
+	winchester-rifle-cock-reload.wav by MentalSanityOff - CC0 1.0 Universal (CC0 1.0)
+
+	trigger-with-hammer-fall.wav by Nanashi - CC0 1.0 Universal (CC0 1.0)
+
