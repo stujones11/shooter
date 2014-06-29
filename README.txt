@@ -1,7 +1,7 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.4.0
+Mod Version: 0.4.1
 
 Minetest Version: 0.4.9
 
