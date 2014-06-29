@@ -72,7 +72,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "shooter:riffle 1 65535",
+	output = "shooter:rifle 1 65535",
 	recipe = {
 		{"default:steel_ingot", "", ""},
 		{"", "default:bronze_ingot", ""},
