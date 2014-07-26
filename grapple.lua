@@ -52,7 +52,7 @@ minetest.register_entity("shooter:hook", {
 				self.object:setacceleration({x=0, y=0, z=0})
 				if minetest.get_item_group(node.name, "liquid") == 0 and
 						minetest.get_node(pos).name == "air" then
-					self.player:setpos(pos)
+					self.player:moveto(pos)
 				end
 				if minetest.get_item_group(node.name, "lava") == 0 then
 					minetest.add_item(pos, self.itemstack)
