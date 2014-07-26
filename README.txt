@@ -1,9 +1,11 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.4.1
+Mod Version: 0.5.0
 
 Minetest Version: 0.4.9
+
+Depends: default, wool, tnt
 
 An experimental first person shooter mod that uses simple vector mathematics
 to produce an accurate and server-firendly method of hit detection.
@@ -23,6 +25,8 @@ Crafting
 S = Steel Ingot  [default:steel_ingot]
 B = Bronze Ingot [default:bronze_ingot]
 M = Mese Crystal [default:mese_crysytal]
+D = Diamond      [default:diamond]
+R = Red Wool     [wool:red]
 G = Gun Powder   [tnt:gunpowder]
 
 Pistol: [shooter:pistol]
@@ -68,4 +72,66 @@ Ammo Pack: [shooter:ammo]
 +---+---+
 | G | B |
 +---+---+
+
+Grappling Hook: [shooter:grapple_hook]
+
++---+---+---+
+| S | S | D |
++---+---+---+
+| S | S |   |
++---+---+---+
+| D |   | S |
++---+---+---+
+
+Grappling Hook Gun: [shooter:grapple_gun]
+
++---+---+
+| S | S |
++---+---+
+|   | D |
++---+---+
+
+Flare: [shooter:flare]
+
++---+---+
+| G | R |
++---+---+
+
+Flare Gun: [shooter:flaregun]
+
++---+---+---+
+| R | R | R |
++---+---+---+
+|   |   | S |
++---+---+---+
+
+Grenade: [shooter:grenade]
+
++---+---+
+| G | S |
++---+---+
+
+Flare Gun: [shooter:rocket_gun]
+
++---+---+---+
+| B | S | S |
++---+---+---+
+|   |   | D |
++---+---+---+
+
+Rocket: [shooter:rocket]
+
++---+---+---+
+| B | G | B |
++---+---+---+
+
+Turret: [shooter:turret]
+
++---+---+---+
+| B | B | S |
++---+---+---+
+|   | B | S |
++---+---+---+
+|   | D |   |
++---+---+---+
 

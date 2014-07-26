@@ -3,8 +3,17 @@ shooter = {
 	objects = {},
 	rounds = {},
 	shots = {},
+	update_time = 0,
+	reload_time = 0,
 }
 
+SHOOTER_ENABLE_GUNS = true
+SHOOTER_ENABLE_FLARES = true
+SHOOTER_ENABLE_HOOK = true
+SHOOTER_ENABLE_GRENADES = true
+SHOOTER_ENABLE_ROCKETS = true
+SHOOTER_ENABLE_TURRETS = true
+SHOOTER_ENABLE_CRAFTING = true
 SHOOTER_ENABLE_PARTICLE_FX = true
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
 SHOOTER_ALLOW_NODES = true
@@ -43,10 +52,6 @@ if input then
 	input:close()
 	input = nil
 end
-
-local rounds_update_time = 0
-local object_update_time = 0
-local object_reload_time = 0
 
 local function get_dot_product(v1, v2)
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
@@ -121,7 +126,7 @@ local function punch_node(pos, def)
 	end
 end
 
-local function process_round(round)
+function shooter:process_round(round)
 	local target = {object=nil, distance=10000}
 	local p1 = round.pos
 	local v1 = round.ray
@@ -307,8 +312,8 @@ function shooter:load_objects()
 			end
 		end
 	end
-	object_reload_time = shooter.time
-	object_update_time = shooter.time
+	shooter.reload_time = shooter.time
+	shooter.update_time = shooter.time
 	shooter.objects = {}
 	for _,v in ipairs(objects) do
 		table.insert(shooter.objects, v)
@@ -316,9 +321,9 @@ function shooter:load_objects()
 end
 
 function shooter:update_objects()
-	if shooter.time - object_reload_time > SHOOTER_OBJECT_RELOAD_TIME then
+	if shooter.time - shooter.reload_time > SHOOTER_OBJECT_RELOAD_TIME then
 		shooter:load_objects()
-	elseif shooter.time - object_update_time > SHOOTER_OBJECT_UPDATE_TIME then
+	elseif shooter.time - shooter.update_time > SHOOTER_OBJECT_UPDATE_TIME then
 		for i, ref in ipairs(shooter.objects) do
 			if ref.object then
 				local pos = ref.object:getpos()
@@ -329,34 +334,68 @@ function shooter:update_objects()
 				table.remove(shooter.objects, i)
 			end
 		end
-		object_update_time = shooter.time
+		shooter.update_time = shooter.time
 	end
+end
+
+function shooter:blast(pos, radius, fleshy, distance)
+	local pos = vector.round(pos)
+	local p1 = vector.subtract(pos, radius)
+	local p2 = vector.add(pos, radius)
+	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
+	minetest.set_node(pos, {name="tnt:boom"})
+	if SHOOTER_ENABLE_PARTICLE_FX == true then
+		minetest.add_particlespawner(50, 0.1,
+			p1, p2, {x=-0, y=-0, z=-0}, {x=0, y=0, z=0},
+			{x=-0.5, y=5, z=-0.5}, {x=0.5, y=5, z=0.5},
+			0.1, 1, 8, 15, false, "tnt_smoke.png"
+		)
+	end
+	local objects = minetest.get_objects_inside_radius(pos, distance)
+	for _,obj in ipairs(objects) do
+		if (obj:is_player() and SHOOTER_ALLOW_PLAYERS == true) or
+				(obj:get_luaentity() and SHOOTER_ALLOW_ENTITIES == true and
+				obj:get_luaentity().name ~= "__builtin:item") then
+			local obj_pos = obj:getpos()
+			local dist = vector.distance(obj_pos, pos)
+			local damage = (fleshy * 0.5 ^ dist) * 2
+			if dist ~= 0 then
+				obj_pos.y = obj_pos.y + 1.7
+				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
+				if minetest.line_of_sight(obj_pos, blast_pos, 1) then
+					obj:punch(obj, 1.0, {
+						full_punch_interval = 1.0,
+						damage_groups = {fleshy=damage},
+					})
+				end
+			end
+		end
+	end
+	local pr = PseudoRandom(os.time())
+	local vm = VoxelManip()
+	local min, max = vm:read_from_map(p1, p2)
+	local area = VoxelArea:new({MinEdge=min, MaxEdge=max})
+	local data = vm:get_data()
+	local c_air = minetest.get_content_id("air")
+	for z = -radius, radius do
+		for y = -radius, radius do
+			local vi = area:index(pos.x - radius, pos.y + y, pos.z + z)
+			for x = -radius, radius do
+				if (x * x) + (y * y) + (z * z) <=
+						(radius * radius) + pr:next(-radius, radius) then
+					data[vi] = c_air
+				end
+				vi = vi + 1
+			end
+		end
+	end
+	vm:set_data(data)
+	vm:update_liquids()
+	vm:write_to_map()
+	vm:update_map()
 end
 
 minetest.register_on_joinplayer(function(player)
 	player:hud_set_flags({crosshair = true})
-end)
-
-minetest.register_globalstep(function(dtime)
-	shooter.time = shooter.time + dtime
-	if shooter.time - rounds_update_time > SHOOTER_ROUNDS_UPDATE_TIME then
-		for i, round in ipairs(shooter.rounds) do
-			if process_round(round) or round.dist > round.def.range then
-				table.remove(shooter.rounds, i)
-			else
-				local v = vector.multiply(round.ray, round.def.step)
-				shooter.rounds[i].pos = vector.add(round.pos, v)
-				shooter.rounds[i].dist = round.dist + round.def.step
-			end
-		end
-		rounds_update_time = shooter.time
-	end
-	if shooter.time > 100000 then
-		shooter.shots = {}
-		rounds_update_time = 0
-		object_reload_time = 0
-		object_update_time = 0
-		shooter.time = 0
-	end
 end)
 

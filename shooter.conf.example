@@ -2,6 +2,27 @@
 
 -- Global Constants (defaults)
 
+-- Enable basic guns (Pistol, Rifle, Shotgun, Machine Gun)
+SHOOTER_ENABLE_GUNS = true
+
+-- Enable Flare Gun
+SHOOTER_ENABLE_FLARES = true
+
+-- Enable Grappling Hook
+SHOOTER_ENABLE_HOOK = true
+
+-- Enable Grenades
+SHOOTER_ENABLE_GRENADES = true
+
+-- Enable Rocket Gun
+SHOOTER_ENABLE_ROCKETS = true
+
+-- Enable Turrret Gun
+SHOOTER_ENABLE_TURRETS = true
+
+-- Enable Crafting
+SHOOTER_ENABLE_CRAFTING = true
+
 -- Enable particle effects
 SHOOTER_ENABLE_PARTICLE_FX = true
 
