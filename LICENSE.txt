@@ -3,6 +3,11 @@ Minetest Mod - Simple Shooter [shooter]
 
 License Source Code: 2013 Stuart Jones - LGPL v2.1
 
+Additional credit for code ideas taken from other mods.
+
+PilzAdam [throwing] for the throwing physics
+ShadowNinja [nuke] for the vm explosion routine
+
 License Textures: Stuart Jones - WTFPL
 
 Licence Models: Stuart Jones - CC-BY-SA 3.0
