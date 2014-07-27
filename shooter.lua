@@ -343,7 +343,9 @@ function shooter:blast(pos, radius, fleshy, distance)
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
 	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
-	minetest.set_node(pos, {name="tnt:boom"})
+	if SHOOTER_ALLOW_NODES == true then
+		minetest.set_node(pos, {name="tnt:boom"})
+	end
 	if SHOOTER_ENABLE_PARTICLE_FX == true then
 		minetest.add_particlespawner(50, 0.1,
 			p1, p2, {x=-0, y=-0, z=-0}, {x=0, y=0, z=0},
@@ -370,6 +372,9 @@ function shooter:blast(pos, radius, fleshy, distance)
 				end
 			end
 		end
+	end
+	if SHOOTER_ALLOW_NODES == false then
+		return
 	end
 	local pr = PseudoRandom(os.time())
 	local vm = VoxelManip()
