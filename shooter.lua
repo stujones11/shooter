@@ -400,7 +400,3 @@ function shooter:blast(pos, radius, fleshy, distance)
 	vm:update_map()
 end
 
-minetest.register_on_joinplayer(function(player)
-	player:hud_set_flags({crosshair = true})
-end)
-
