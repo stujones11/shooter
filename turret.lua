@@ -43,7 +43,7 @@ minetest.register_entity("shooter:tnt_entity", {
 			local pos = self.object:getpos()
 			if minetest.get_node(pos).name ~= "air" then
 				self.object:remove()
-				shooter:blast(pos, 4, 80, 10)
+				shooter:blast(pos, 4, 80, 10, self.player)
 			end
 			self.timer = 0
 		end
@@ -172,10 +172,14 @@ minetest.register_entity("shooter:turret_entity", {
 		pos = vector.add(pos, {x=dir.x * 1.5, y=dir.y * 1.5, z=dir.z * 1.5})
 		local obj = minetest.add_entity(pos, "shooter:tnt_entity")
 		if obj then
-			minetest.sound_play("shooter_rocket_fire", {object=obj})
-			obj:setyaw(self.yaw)
-			obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
-			obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+			local ent = obj:get_luaentity()
+			if ent then
+				minetest.sound_play("shooter_rocket_fire", {object=obj})
+				ent.player = self.player
+				obj:setyaw(self.yaw)
+				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
+				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+			end
 		end
 		if SHOOTER_ENABLE_PARTICLE_FX == true then
 			minetest.add_particlespawner(10, 0.1,

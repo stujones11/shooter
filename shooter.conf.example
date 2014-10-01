@@ -2,6 +2,9 @@
 
 -- Global Constants (defaults)
 
+-- Enable node destruction with explosives
+SHOOTER_ENABLE_BLASTING = true
+
 -- Enable basic guns (Pistol, Rifle, Shotgun, Machine Gun)
 SHOOTER_ENABLE_GUNS = true
 
@@ -25,6 +28,10 @@ SHOOTER_ENABLE_CRAFTING = true
 
 -- Enable particle effects
 SHOOTER_ENABLE_PARTICLE_FX = true
+
+-- Enable protection mod support, requires a protection mod that utilizes
+-- minetest.is_protected(), tested with TenPlus1's version of [protector]
+SHOOTER_ENABLE_PROTECTION = false
 
 -- Particle texture used when a player or entity is hit
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"

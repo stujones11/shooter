@@ -7,6 +7,7 @@ shooter = {
 	reload_time = 0,
 }
 
+SHOOTER_ENABLE_BLASTING = true
 SHOOTER_ENABLE_GUNS = true
 SHOOTER_ENABLE_FLARES = true
 SHOOTER_ENABLE_HOOK = true
@@ -15,6 +16,7 @@ SHOOTER_ENABLE_ROCKETS = true
 SHOOTER_ENABLE_TURRETS = true
 SHOOTER_ENABLE_CRAFTING = true
 SHOOTER_ENABLE_PARTICLE_FX = true
+SHOOTER_ENABLE_PROTECTION = false
 SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
 SHOOTER_ALLOW_NODES = true
 SHOOTER_ALLOW_ENTITIES = false
@@ -36,6 +38,7 @@ SHOOTER_ENTITIES = {
 }
 
 if minetest.is_singleplayer() == true then
+	SHOOTER_ENABLE_BLASTING = true
 	SHOOTER_ALLOW_ENTITIES = true
 	SHOOTER_ALLOW_PLAYERS = false
 end
@@ -103,6 +106,12 @@ local function punch_node(pos, def)
 	local item = minetest.registered_items[node.name]
 	if not item then
 		return
+	end
+	if SHOOTER_ENABLE_PROTECTION then
+		if minetest.is_protected(pos, def.name) then
+			print(dump(def))
+			return
+		end
 	end
 	if item.groups then
 		for k, v in pairs(def.groups) do
@@ -338,13 +347,23 @@ function shooter:update_objects()
 	end
 end
 
-function shooter:blast(pos, radius, fleshy, distance)
+function shooter:blast(pos, radius, fleshy, distance, user)
+	if not user then
+		return
+	end
+	local name = user:get_player_name()
 	local pos = vector.round(pos)
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
 	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
 	if SHOOTER_ALLOW_NODES == true then
-		minetest.set_node(pos, {name="tnt:boom"})
+		if SHOOTER_ENABLE_PROTECTION then		
+			if not minetest.is_protected(pos, name) then
+				minetest.set_node(pos, {name="tnt:boom"})
+			end
+		else
+			minetest.set_node(pos, {name="tnt:boom"})
+		end
 	end
 	if SHOOTER_ENABLE_PARTICLE_FX == true then
 		minetest.add_particlespawner(50, 0.1,
@@ -373,30 +392,36 @@ function shooter:blast(pos, radius, fleshy, distance)
 			end
 		end
 	end
-	if SHOOTER_ALLOW_NODES == false then
-		return
-	end
-	local pr = PseudoRandom(os.time())
-	local vm = VoxelManip()
-	local min, max = vm:read_from_map(p1, p2)
-	local area = VoxelArea:new({MinEdge=min, MaxEdge=max})
-	local data = vm:get_data()
-	local c_air = minetest.get_content_id("air")
-	for z = -radius, radius do
-		for y = -radius, radius do
-			local vi = area:index(pos.x - radius, pos.y + y, pos.z + z)
-			for x = -radius, radius do
-				if (x * x) + (y * y) + (z * z) <=
-						(radius * radius) + pr:next(-radius, radius) then
-					data[vi] = c_air
+	if SHOOTER_ALLOW_NODES and SHOOTER_ENABLE_BLASTING then
+		local pr = PseudoRandom(os.time())
+		local vm = VoxelManip()
+		local min, max = vm:read_from_map(p1, p2)
+		local area = VoxelArea:new({MinEdge=min, MaxEdge=max})
+		local data = vm:get_data()
+		local c_air = minetest.get_content_id("air")
+		for z = -radius, radius do
+			for y = -radius, radius do
+				local vp = {x=pos.x - radius, y=pos.y + y, z=pos.z + z}
+				local vi = area:index(vp.x, vp.y, vp.z)
+				for x = -radius, radius do
+					if (x * x) + (y * y) + (z * z) <=
+							(radius * radius) + pr:next(-radius, radius) then
+						if SHOOTER_ENABLE_PROTECTION then		
+							if not minetest.is_protected(vp, name) then
+								data[vi] = c_air
+							end
+						else
+							data[vi] = c_air
+						end
+					end
+					vi = vi + 1
 				end
-				vi = vi + 1
 			end
 		end
+		vm:set_data(data)
+		vm:update_liquids()
+		vm:write_to_map()
+		vm:update_map()
 	end
-	vm:set_data(data)
-	vm:update_liquids()
-	vm:write_to_map()
-	vm:update_map()
 end
 

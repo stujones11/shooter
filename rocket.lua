@@ -30,7 +30,7 @@ minetest.register_entity("shooter:rocket_entity", {
 			local pos = self.object:getpos()
 			if minetest.get_node(pos).name ~= "air" then
 				self.object:remove()
-				shooter:blast(pos, 2, 50, 7)
+				shooter:blast(pos, 2, 50, 7, self.player)
 			end
 			self.timer = 0
 		end

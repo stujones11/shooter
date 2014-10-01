@@ -25,7 +25,7 @@ minetest.register_entity("shooter:grenade_entity", {
 			local below = {x=pos.x, y=pos.y - 1, z=pos.z}
 			if minetest.get_node(below).name ~= "air" then
 				self.object:remove()
-				shooter:blast(pos, 1, 25, 5)
+				shooter:blast(pos, 1, 25, 5, self.player)
 			end
 			self.timer = 0
 		end
