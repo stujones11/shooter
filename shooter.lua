@@ -109,7 +109,6 @@ local function punch_node(pos, def)
 	end
 	if SHOOTER_ENABLE_PROTECTION then
 		if minetest.is_protected(pos, def.name) then
-			print(dump(def))
 			return
 		end
 	end
