@@ -1,9 +1,9 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.5.0
+Mod Version: 0.5.1
 
-Minetest Version: 0.4.9
+Minetest Version: 0.4.9, 0.4.10
 
 Depends: default, wool, tnt
 
