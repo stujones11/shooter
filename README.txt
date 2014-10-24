@@ -1,7 +1,7 @@
 Minetest Mod - Simple Shooter [shooter]
 =======================================
 
-Mod Version: 0.5.1
+Mod Version: 0.5.2
 
 Minetest Version: 0.4.9, 0.4.10
 
@@ -22,12 +22,34 @@ as the base for a 'Spades' style FPS game using the minetest engine.
 Crafting
 ========
 
+W = Wooden Stick [default:stick]
+P = Paper        [default:paper]
 S = Steel Ingot  [default:steel_ingot]
 B = Bronze Ingot [default:bronze_ingot]
 M = Mese Crystal [default:mese_crysytal]
 D = Diamond      [default:diamond]
 R = Red Wool     [wool:red]
 G = Gun Powder   [tnt:gunpowder]
+
+Crossbow: [shooter:crossbow]
+
++---+---+---+
+| W | W | W |
++---+---+---+
+| W | W |   |
++---+---+---+
+| W |   | B |
++---+---+---+
+
+Arrow: [shooter:arrow]
+
++---+---+---+
+| S |   |   |
++---+---+---+
+|   | W | P |
++---+---+---+
+|   | P | B |
++---+---+---+
 
 Pistol: [shooter:pistol]
 
