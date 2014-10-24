@@ -2,6 +2,9 @@ local modpath = minetest.get_modpath(minetest.get_current_modname())
 
 dofile(modpath.."/shooter.lua")
 
+if SHOOTER_ENABLE_CROSSBOW == true then
+	dofile(modpath.."/crossbow.lua")
+end
 if SHOOTER_ENABLE_GUNS == true then
 	dofile(modpath.."/guns.lua")
 end
