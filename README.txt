@@ -48,7 +48,7 @@ Arrow: [shooter:arrow]
 +---+---+---+
 |   | W | P |
 +---+---+---+
-|   | P | B |
+|   | P | W |
 +---+---+---+
 
 Pistol: [shooter:pistol]
