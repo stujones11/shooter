@@ -7,7 +7,8 @@ shooter = {
 	reload_time = 0,
 }
 
-SHOOTER_ENABLE_BLASTING = true
+SHOOTER_ENABLE_BLASTING = false
+SHOOTER_ENABLE_CROSSBOW = true
 SHOOTER_ENABLE_GUNS = true
 SHOOTER_ENABLE_FLARES = true
 SHOOTER_ENABLE_HOOK = true
@@ -64,7 +65,7 @@ local function get_particle_pos(p, v, d)
 	return vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
 end
 
-local function spawn_particles(pos, texture)
+function shooter:spawn_particles(pos, texture)
 	if SHOOTER_ENABLE_PARTICLE_FX == true then
 		if type(texture) ~= "string" then
 			texture = SHOOTER_EXPLOSION_TEXTURE
@@ -79,26 +80,20 @@ local function spawn_particles(pos, texture)
 	end
 end
 
-local function is_valid_object(object)
-	if object then
-		if object:is_player() == true then
-			return true
-		end
-		if SHOOTER_ALLOW_ENTITIES == true then
-			local luaentity = object:get_luaentity()
-			if luaentity then
-				if luaentity.name then
-					if allowed_entities[luaentity.name] then
-						return true
-					end
-				end
+function shooter:play_node_sound(node, pos)
+	local item = minetest.registered_items[node.name]
+	if item then
+		if item.sounds then
+			local spec = item.sounds.dug
+			if spec then
+				spec.pos = pos
+				minetest.sound_play(spec.name, spec)
 			end
 		end
 	end
-	return false
 end
 
-local function punch_node(pos, def)
+function shooter:punch_node(pos, def)
 	local node = minetest.get_node(pos)
 	if not node then
 		return
@@ -117,19 +112,49 @@ local function punch_node(pos, def)
 			local level = item.groups[k] or 0
 			if level >= v then
 				minetest.remove_node(pos)
-				local sounds = item.sounds
-				if item.sounds then
-					local spec = item.sounds.dug
-					if spec then
-						spec.pos = pos
-						minetest.sound_play(spec.name, spec)
-					end
-				end
+				shooter:play_node_sound(node, pos)
 				if item.tiles then
-					return item.tiles[1]
+					if item.tiles[1] then
+						shooter:spawn_particles(pos, item.tiles[1])
+					end
 				end
 				break
 			end
+		end
+	end
+end
+
+function shooter:is_valid_object(object)
+	if object then
+		if object:is_player() == true then
+			return SHOOTER_ALLOW_PLAYERS
+		end
+		if SHOOTER_ALLOW_ENTITIES == true then
+			local luaentity = object:get_luaentity()
+			if luaentity then
+				if luaentity.name then
+					if allowed_entities[luaentity.name] then
+						return true
+					end
+				end
+			end
+		end
+	end
+end
+
+function shooter:get_intersect_pos(ray, plane, collisionbox)
+	local v = vector.subtract(ray.pos, plane.pos)
+	local r1 = get_dot_product(v, plane.normal)
+	local r2 = get_dot_product(ray.dir, plane.normal)
+	if r2 ~= 0 then
+		local t = -(r1 / r2)
+		local td = vector.multiply(ray.dir, {x=t, y=t, z=t})
+		local pt = vector.add(ray.pos, td)
+		local pd = vector.subtract(pt, plane.pos)
+		if math.abs(pd.x) < collisionbox[4] and
+				math.abs(pd.y) < collisionbox[5] and
+				math.abs(pd.z) < collisionbox[6] then
+			return pt
 		end
 	end
 end
@@ -142,23 +167,14 @@ function shooter:process_round(round)
 		local p2 = vector.add(ref.pos, ref.offset)
 		if p1 and p2 and ref.name ~= round.name then
 			local d = vector.distance(p1, p2)
-			if d < round.def.step then
-				local n = vector.multiply(v1, {x=-1, y=0, z=-1})
-				local v2 = vector.subtract(p1, p2)
-				local r1 = get_dot_product(n, v2)
-				local r2 = get_dot_product(n, v1)
-				if r2 ~= 0 then
-					local t = -(r1 / r2)
-					local td = vector.multiply(v1, {x=t, y=t, z=t})
-					local pt = vector.add(p1, td)
-					local pd = vector.subtract(pt, p2)
-					if math.abs(pd.x) < ref.collisionbox[4] and
-							math.abs(pd.y) < ref.collisionbox[5] and
-							math.abs(pd.z) < ref.collisionbox[6] then
-						target.object = ref.object
-						target.pos = pt
-						target.distance = d
-					end
+			if d < round.def.step and d < target.distance then
+				local ray = {pos=p1, dir=v1}
+				local plane = {pos=p2, normal={x=-1, y=0, z=-1}}
+				local pos = shooter:get_intersect_pos(ray, plane, ref.collisionbox)
+				if pos then
+					target.object = ref.object
+					target.pos = pos
+					target.distance = d
 				end
 			end
 		end
@@ -169,15 +185,11 @@ function shooter:process_round(round)
 			local user = minetest.get_player_by_name(round.name)
 			if user then
 				target.object:punch(user, nil, round.def.tool_caps, v1)
-				spawn_particles(target.pos, SHOOTER_EXPLOSION_TEXTURE)
+				shooter:spawn_particles(target.pos, SHOOTER_EXPLOSION_TEXTURE)
 			end
 			return 1
 		elseif pos and SHOOTER_ALLOW_NODES == true then
-			local texture = punch_node(pos, round.def)
-			if texture then
-				local pp = get_particle_pos(p1, v1, vector.distance(p1, pos))
-				spawn_particles(pp, texture)
-			end
+			shooter:punch_node(pos, round.def)
 			return 1
 		end
 	elseif SHOOTER_ALLOW_NODES == true then
@@ -185,11 +197,7 @@ function shooter:process_round(round)
 		local p2 = vector.add(p1, vector.multiply(v1, {x=d, y=d, z=d}))
 		local success, pos = minetest.line_of_sight(p1, p2, 1)
 		if pos then
-			local texture = punch_node(pos, round.def)
-			if texture then
-				local pp = get_particle_pos(p1, v1, vector.distance(p1, pos))
-				spawn_particles(pp, texture)
-			end
+			shooter:punch_node(pos, round.def)
 			return 1
 		end
 	end
@@ -207,7 +215,7 @@ function shooter:register_weapon(name, def)
 				def.spec.name = user:get_player_name()
 				if shots > 1 then
 					local step = def.spec.tool_caps.full_punch_interval
-					for i = 0, step * (shots), step do
+					for i = 0, step * shots, step do
 						minetest.after(i, function()
 							shooter:fire_weapon(user, pointed_thing, def.spec)
 						end)
@@ -254,20 +262,15 @@ function shooter:fire_weapon(user, pointed_thing, def)
 	)
 	if pointed_thing.type == "node" and SHOOTER_ALLOW_NODES == true then
 		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
-		local texture = punch_node(pos, def)
-		if texture then
-			local pp = get_particle_pos(p1, v1, vector.distance(p1, pos))
-			pp.y = pp.y + 1.75
-			spawn_particles(pp, texture)
-		end
+		shooter:punch_node(pos, def)
 	elseif pointed_thing.type == "object" then
 		local object = pointed_thing.ref
-		if is_valid_object(object) == true then
+		if shooter:is_valid_object(object) == true then
 			object:punch(user, nil, def.tool_caps, v1)
 			local p2 = object:getpos()
 			local pp = get_particle_pos(p1, v1, vector.distance(p1, p2))
 			pp.y = pp.y + 1.75
-			spawn_particles(pp, SHOOTER_EXPLOSION_TEXTURE)
+			shooter:spawn_particles(pp, SHOOTER_EXPLOSION_TEXTURE)
 		end
 	else
 		shooter:update_objects()
@@ -294,7 +297,7 @@ function shooter:load_objects()
 					name = name,
 					object = player,
 					pos = pos,
-					collisionbox = {-0.25,-1.0,-0.25, 0.25, 0.8, 0.25},
+					collisionbox = {-0.25,-1.0,-0.25, 0.25,0.8,0.25},
 					offset = SHOOTER_PLAYER_OFFSET,
 				})
 			end
@@ -355,8 +358,8 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
 	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
-	if SHOOTER_ALLOW_NODES == true and SHOOTER_ENABLE_BLASTING then
-		if SHOOTER_ENABLE_PROTECTION then		
+	if SHOOTER_ALLOW_NODES and SHOOTER_ENABLE_BLASTING then
+		if SHOOTER_ENABLE_PROTECTION then
 			if not minetest.is_protected(pos, name) then
 				minetest.set_node(pos, {name="tnt:boom"})
 			end
@@ -405,7 +408,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 				for x = -radius, radius do
 					if (x * x) + (y * y) + (z * z) <=
 							(radius * radius) + pr:next(-radius, radius) then
-						if SHOOTER_ENABLE_PROTECTION then		
+						if SHOOTER_ENABLE_PROTECTION then
 							if not minetest.is_protected(vp, name) then
 								data[vi] = c_air
 							end
