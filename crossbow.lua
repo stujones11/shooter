@@ -216,7 +216,7 @@ minetest.register_tool("shooter:crossbow_loaded", {
 })
 
 minetest.register_tool("shooter:crossbow", {
-	description = "Crassbow",
+	description = "Crossbow",
 	inventory_image = "shooter_crossbow.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
