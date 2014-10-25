@@ -149,7 +149,7 @@ minetest.register_entity("shooter:arrow_entity", {
 				self.node_pos = npos
 				self.state = "stuck"
 				stop_arrow(self.object, tpos, true)
-				shooter:play_node_sound(node)
+				shooter:play_node_sound(node, npos)
 			end
 			self.timer = 0
 		end
@@ -201,7 +201,7 @@ minetest.register_tool("shooter:crossbow_loaded", {
 							ent.node_pos = npos
 							ent.state = "stuck"
 							stop_arrow(object, pos, true)
-							shooter:play_node_sound(node)
+							shooter:play_node_sound(node, npos)
 						end, obj, tpos, ppos)
 						return itemstack
 					end
