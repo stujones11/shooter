@@ -47,9 +47,14 @@ local function stop_arrow(object, pos, stuck)
 	object:setacceleration(acceleration)
 end
 
+-- name is the overlay texture name, colour is used to select the wool texture
+local function get_texture(name, colour)
+	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
+end
+
 minetest.register_craftitem("shooter:arrow", {
 	description = "Arrow",
-	inventory_image = "shooter_arrow_inv.png",
+	inventory_image = get_texture("arrow_inv", "white"),
 })
 
 minetest.register_entity("shooter:arrow_entity", {
@@ -58,7 +63,7 @@ minetest.register_entity("shooter:arrow_entity", {
 	mesh = "shooter_arrow.b3d",
 	visual_size = {x=1, y=1},
 	textures = {
-		"shooter_arrow_uv.png",
+		get_texture("arrow_uv", "white"),
 	},
 	timer = 0,
 	lifetime = SHOOTER_ARROW_LIFETIME,
@@ -161,7 +166,7 @@ minetest.register_entity("shooter:arrow_entity", {
 
 minetest.register_tool("shooter:crossbow_loaded", {
 	description = "Crossbow",
-	inventory_image = "shooter_crossbow_loaded.png",
+	inventory_image = get_texture("crossbow_loaded", "white"),
 	groups = {not_in_creative_inventory=1},
 	on_use = function(itemstack, user, pointed_thing)
 		minetest.sound_play("shooter_click", {object=user})
