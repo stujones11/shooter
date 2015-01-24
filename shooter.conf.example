@@ -2,6 +2,10 @@
 
 -- Global Constants (defaults)
 
+-- Enable admin super weapons
+-- This lets admins shoot guns automatically after 2 seconds without munition.
+SHOOTER_ADMIN_WEAPONS = false
+
 -- Enable node destruction with explosives
 SHOOTER_ENABLE_BLASTING = true
 
