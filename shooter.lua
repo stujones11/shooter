@@ -38,7 +38,8 @@ SHOOTER_ENTITIES = {
 	"mobs:dungeon_master",
 }
 
-if minetest.is_singleplayer() == true then
+local singleplayer = minetest.is_singleplayer()
+if singleplayer then
 	SHOOTER_ENABLE_BLASTING = true
 	SHOOTER_ALLOW_ENTITIES = true
 	SHOOTER_ALLOW_PLAYERS = false
@@ -203,7 +204,9 @@ function shooter:process_round(round)
 	end
 end
 
+shooter.registered_weapons = shooter.registered_weapons or {}
 function shooter:register_weapon(name, def)
+	shooter.registered_weapons[name] = def
 	local shots = def.shots or 1
 	local wear = math.ceil(65534 / def.rounds)
 	local max_wear = (def.rounds - 1) * wear
@@ -427,3 +430,32 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	end
 end
 
+if not singleplayer then
+	local timer = 0
+	local shooting = false
+	minetest.register_globalstep(function(dtime)
+		if not shooting then
+			timer = timer+dtime
+			if timer < 2 then
+				return
+			end
+			timer = 0
+		end
+		shooting = false
+		for _,player in pairs(minetest.get_connected_players()) do
+			if player:get_player_control().LMB then
+				local name = player:get_player_name()
+				if minetest.check_player_privs(name, {server=true}) then
+					local spec = shooter.registered_weapons[player:get_wielded_item():get_name()]
+					if spec then
+						spec = spec.spec
+						shooter.shots[name] = false
+						spec.name = name
+						shooter:fire_weapon(player, {}, spec)
+						shooting = true
+					end
+				end
+			end
+		end
+	end)
+end
