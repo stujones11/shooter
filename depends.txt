@@ -1,3 +1,5 @@
 default
-wool
+dye
 tnt
+wool
+

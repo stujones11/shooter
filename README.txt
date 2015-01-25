@@ -5,7 +5,7 @@ Mod Version: 0.5.2
 
 Minetest Version: 0.4.9, 0.4.10
 
-Depends: default, wool, tnt
+Depends: default, dye, tnt, wool
 
 An experimental first person shooter mod that uses simple vector mathematics
 to produce an accurate and server-firendly method of hit detection.
@@ -22,6 +22,10 @@ as the base for a 'Spades' style FPS game using the minetest engine.
 Crafting
 ========
 
+<color> = grey, black, red, yellow, green, cyan, blue, magenta
+
+A = Arrow        [shooter:arrow_white]
+C = Color Dye    [dye:<color>]
 W = Wooden Stick [default:stick]
 P = Paper        [default:paper]
 S = Steel Ingot  [default:steel_ingot]
@@ -41,7 +45,7 @@ Crossbow: [shooter:crossbow]
 | W |   | B |
 +---+---+---+
 
-Arrow: [shooter:arrow]
+White Arrow: [shooter:arrow_white]
 
 +---+---+---+
 | S |   |   |
@@ -50,6 +54,12 @@ Arrow: [shooter:arrow]
 +---+---+---+
 |   | P | W |
 +---+---+---+
+
+Coloured Arrow: [shooter:arrow_<color>]
+
++---+---+
+| C | A |
++---+---+
 
 Pistol: [shooter:pistol]
 

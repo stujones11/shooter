@@ -2,6 +2,9 @@ SHOOTER_CROSSBOW_USES = 50
 SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=2}}
 SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
 
+minetest.register_alias("shooter:arrow", "shooter:arrow_white")
+minetest.register_alias("shooter:crossbow_loaded", "shooter:crossbow_loaded_white")
+
 local function get_animation_frame(dir)
 	local angle = math.atan(dir.y)
 	local frame = 90 - math.floor(angle * 360 / math.pi)
@@ -52,11 +55,6 @@ local function get_texture(name, colour)
 	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
 end
 
-minetest.register_craftitem("shooter:arrow", {
-	description = "Arrow",
-	inventory_image = get_texture("arrow_inv", "white"),
-})
-
 minetest.register_entity("shooter:arrow_entity", {
 	physical = false,
 	visual = "mesh",
@@ -65,6 +63,7 @@ minetest.register_entity("shooter:arrow_entity", {
 	textures = {
 		get_texture("arrow_uv", "white"),
 	},
+	color = "white",
 	timer = 0,
 	lifetime = SHOOTER_ARROW_LIFETIME,
 	player = nil,
@@ -80,7 +79,7 @@ minetest.register_entity("shooter:arrow_entity", {
 	on_punch = function(self, puncher)
 		if puncher then
 			if puncher:is_player() then
-				local stack = "shooter:arrow"
+				local stack = "shooter:arrow_"..self.color
 				local inv = puncher:get_inventory()
 				if inv:room_for_item("main", stack) then
 					inv:add_item("main", stack)
@@ -164,77 +163,87 @@ minetest.register_entity("shooter:arrow_entity", {
 	end,
 })
 
-minetest.register_tool("shooter:crossbow_loaded", {
-	description = "Crossbow",
-	inventory_image = get_texture("crossbow_loaded", "white"),
-	groups = {not_in_creative_inventory=1},
-	on_use = function(itemstack, user, pointed_thing)
-		minetest.sound_play("shooter_click", {object=user})
-		if not minetest.setting_getbool("creative_mode") then
-			itemstack:add_wear(65535/SHOOTER_CROSSBOW_USES)
-		end
-		itemstack = "shooter:crossbow 1 "..itemstack:get_wear()
-		local pos = user:getpos()
-		local dir = user:get_look_dir()
-		local yaw = user:get_look_yaw()
-		if pos and dir and yaw then
-			pos.y = pos.y + 1.5
-			local obj = minetest.add_entity(pos, "shooter:arrow_entity")
-			local ent = nil
-			if obj then
-				ent = obj:get_luaentity()
+for _, color in pairs(dye.basecolors) do
+	minetest.register_craftitem("shooter:arrow_"..color, {
+		description = color:gsub("%a", string.upper, 1).." Arrow",
+		inventory_image = get_texture("arrow_inv", color),
+	})
+	minetest.register_tool("shooter:crossbow_loaded_"..color, {
+		description = "Crossbow",
+		inventory_image = get_texture("crossbow_loaded", color),
+		groups = {not_in_creative_inventory=1},
+		on_use = function(itemstack, user, pointed_thing)
+			minetest.sound_play("shooter_click", {object=user})
+			if not minetest.setting_getbool("creative_mode") then
+				itemstack:add_wear(65535/SHOOTER_CROSSBOW_USES)
 			end
-			if ent then
-				minetest.sound_play("shooter_throw", {object=obj}) 
-				local frame = get_animation_frame(dir)
-				obj:setyaw(yaw + math.pi)
-				obj:set_animation({x=frame, y=frame}, 0)
-				obj:setvelocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
-				if pointed_thing.type ~= "nothing" then
-					local ppos = minetest.get_pointed_thing_position(pointed_thing, false)
-					local _, npos = minetest.line_of_sight(pos, ppos, 1)
-					if npos then
-						ppos = npos
-						pointed_thing.type = "node"
-					end
-					if pointed_thing.type == "object" then
-						punch_object(user, pointed_thing.ref)
-					elseif pointed_thing.type == "node" then
-						local node = minetest.get_node(ppos)
-						local tpos = get_target_pos(pos, ppos, dir, 0.66)
-						minetest.after(0.2, function(object, pos, npos)
-							ent.node_pos = npos
-							ent.state = "stuck"
-							stop_arrow(object, pos, true)
-							shooter:play_node_sound(node, npos)
-						end, obj, tpos, ppos)
-						return itemstack
-					end
+			itemstack = "shooter:crossbow 1 "..itemstack:get_wear()
+			local pos = user:getpos()
+			local dir = user:get_look_dir()
+			local yaw = user:get_look_yaw()
+			if pos and dir and yaw then
+				pos.y = pos.y + 1.5
+				local obj = minetest.add_entity(pos, "shooter:arrow_entity")
+				local ent = nil
+				if obj then
+					ent = obj:get_luaentity()
 				end
-				obj:setacceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
-				ent.player = ent.player or user
-				ent.state = "flight"
+				if ent then
+					ent.color = color
+					obj:set_properties({
+						textures = {get_texture("arrow_uv", color)}
+					})
+					minetest.sound_play("shooter_throw", {object=obj}) 
+					local frame = get_animation_frame(dir)
+					obj:setyaw(yaw + math.pi)
+					obj:set_animation({x=frame, y=frame}, 0)
+					obj:setvelocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
+					if pointed_thing.type ~= "nothing" then
+						local ppos = minetest.get_pointed_thing_position(pointed_thing, false)
+						local _, npos = minetest.line_of_sight(pos, ppos, 1)
+						if npos then
+							ppos = npos
+							pointed_thing.type = "node"
+						end
+						if pointed_thing.type == "object" then
+							punch_object(user, pointed_thing.ref)
+						elseif pointed_thing.type == "node" then
+							local node = minetest.get_node(ppos)
+							local tpos = get_target_pos(pos, ppos, dir, 0.66)
+							minetest.after(0.2, function(object, pos, npos)
+								ent.node_pos = npos
+								ent.state = "stuck"
+								stop_arrow(object, pos, true)
+								shooter:play_node_sound(node, npos)
+							end, obj, tpos, ppos)
+							return itemstack
+						end
+					end
+					obj:setacceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
+					ent.player = ent.player or user
+					ent.state = "flight"
+				end
 			end
-		end
-		return itemstack
-	end,
-})
+			return itemstack
+		end,
+	})
+end
 
 minetest.register_tool("shooter:crossbow", {
 	description = "Crossbow",
 	inventory_image = "shooter_crossbow.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
-		if inv:contains_item("main", "shooter:arrow") then
-			minetest.sound_play("shooter_reload", {object=user})
-			if not minetest.setting_getbool("creative_mode") then
-				inv:remove_item("main", "shooter:arrow 1")
+		for _, color in pairs(dye.basecolors) do
+			if inv:contains_item("main", "shooter:arrow_"..color) then
+				minetest.sound_play("shooter_reload", {object=user})
+				if not minetest.setting_getbool("creative_mode") then
+					inv:remove_item("main", "shooter:arrow_"..color.." 1")
+				end
+				return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
 			end
-			itemstack = "shooter:crossbow_loaded 1 "..itemstack:get_wear()
-		else
-			minetest.sound_play("shooter_click", {object=user})
 		end
-		return itemstack
+		minetest.sound_play("shooter_click", {object=user})
 	end,
 })
 
@@ -248,12 +257,22 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 	minetest.register_craft({
-		output = "shooter:arrow",
+		output = "shooter:arrow_white",
 		recipe = {
 			{"default:steel_ingot", "", ""},
 			{"", "default:stick", "default:paper"},
 			{"", "default:paper", "default:stick"},
 		},
 	})
+	for _, color in pairs(dye.basecolors) do
+		if color ~= "white" then
+			minetest.register_craft({
+				output = "shooter:arrow_"..color,
+				recipe = {
+					{"", "dye:"..color, "shooter:arrow_white"},
+				},
+			})
+		end
+	end
 end
 
