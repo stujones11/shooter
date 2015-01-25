@@ -46,17 +46,17 @@ if singleplayer then
 	SHOOTER_ALLOW_PLAYERS = false
 end
 
-local allowed_entities = {}
-for _,v in ipairs(SHOOTER_ENTITIES) do
-	allowed_entities[v] = 1
-end
-
 local modpath = minetest.get_modpath(minetest.get_current_modname())
 local input = io.open(modpath.."/shooter.conf", "r")
 if input then
 	dofile(modpath.."/shooter.conf")
 	input:close()
 	input = nil
+end
+
+local allowed_entities = {}
+for _,v in ipairs(SHOOTER_ENTITIES) do
+	allowed_entities[v] = 1
 end
 
 local function get_dot_product(v1, v2)
@@ -319,7 +319,7 @@ function shooter:load_objects()
 							name = ref.name,
 							object = ref.object,
 							pos = pos,
-							collisionbox = def.collisionbox,
+							collisionbox = def.collisionbox or {0,0,0, 0,0,0},
 							offset = SHOOTER_ENTITY_OFFSET,
 						})
 					end
