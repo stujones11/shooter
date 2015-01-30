@@ -5,7 +5,8 @@ SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
 minetest.register_alias("shooter:arrow", "shooter:arrow_white")
 minetest.register_alias("shooter:crossbow_loaded", "shooter:crossbow_loaded_white")
 
-local dye_basecolors = {"white", "grey", "black", "red", "yellow", "green", "cyan", "blue", "magenta"}
+local dye_basecolors = (dye and dye.basecolors) or
+		{"white", "grey", "black", "red", "yellow", "green", "cyan", "blue", "magenta"}
 
 local function get_animation_frame(dir)
 	local angle = math.atan(dir.y)
