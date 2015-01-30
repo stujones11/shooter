@@ -234,6 +234,14 @@ minetest.register_tool("shooter:crossbow", {
 	inventory_image = "shooter_crossbow.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
+		local stack = inv:get_stack("main", user:get_wield_index() + 1)
+		local color = string.match(stack:get_name(), "shooter:arrow_(%a+)")
+		if color then
+			if not minetest.setting_getbool("creative_mode") then
+				inv:remove_item("main", "shooter:arrow_"..color.." 1")
+			end
+			return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
+		end
 		for _, color in pairs(dye.basecolors) do
 			if inv:contains_item("main", "shooter:arrow_"..color) then
 				minetest.sound_play("shooter_reload", {object=user})
