@@ -5,6 +5,8 @@ SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
 minetest.register_alias("shooter:arrow", "shooter:arrow_white")
 minetest.register_alias("shooter:crossbow_loaded", "shooter:crossbow_loaded_white")
 
+local dye_basecolors = {"white", "grey", "black", "red", "yellow", "green", "cyan", "blue", "magenta"}
+
 local function get_animation_frame(dir)
 	local angle = math.atan(dir.y)
 	local frame = 90 - math.floor(angle * 360 / math.pi)
@@ -163,7 +165,7 @@ minetest.register_entity("shooter:arrow_entity", {
 	end,
 })
 
-for _, color in pairs(dye.basecolors) do
+for _, color in pairs(dye_basecolors) do
 	minetest.register_craftitem("shooter:arrow_"..color, {
 		description = color:gsub("%a", string.upper, 1).." Arrow",
 		inventory_image = get_texture("arrow_inv", color),
@@ -243,7 +245,7 @@ minetest.register_tool("shooter:crossbow", {
 			end
 			return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
 		end
-		for _, color in pairs(dye.basecolors) do
+		for _, color in pairs(dye_basecolors) do
 			if inv:contains_item("main", "shooter:arrow_"..color) then
 				minetest.sound_play("shooter_reload", {object=user})
 				if not minetest.setting_getbool("creative_mode") then
@@ -273,7 +275,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 			{"", "default:paper", "default:stick"},
 		},
 	})
-	for _, color in pairs(dye.basecolors) do
+	for _, color in pairs(dye_basecolors) do
 		if color ~= "white" then
 			minetest.register_craft({
 				output = "shooter:arrow_"..color,
