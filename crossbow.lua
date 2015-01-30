@@ -237,6 +237,7 @@ minetest.register_tool("shooter:crossbow", {
 		local stack = inv:get_stack("main", user:get_wield_index() + 1)
 		local color = string.match(stack:get_name(), "shooter:arrow_(%a+)")
 		if color then
+			minetest.sound_play("shooter_reload", {object=user})
 			if not minetest.setting_getbool("creative_mode") then
 				inv:remove_item("main", "shooter:arrow_"..color.." 1")
 			end
