@@ -47,9 +47,16 @@ if singleplayer then
 end
 
 local modpath = minetest.get_modpath(minetest.get_current_modname())
+local worldpath = minetest.get_worldpath()
 local input = io.open(modpath.."/shooter.conf", "r")
 if input then
 	dofile(modpath.."/shooter.conf")
+	input:close()
+	input = nil
+end
+input = io.open(worldpath.."/shooter.conf", "r")
+if input then
+	dofile(worldpath.."/shooter.conf")
 	input:close()
 	input = nil
 end
