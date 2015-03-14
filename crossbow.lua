@@ -25,34 +25,6 @@ local function get_target_pos(p1, p2, dir, offset)
 	return vector.add(p1, td)
 end
 
-local function punch_object(puncher, object)
-	if puncher and shooter:is_valid_object(object) then
-		if puncher ~= object then
-			local dir = puncher:get_look_dir()
-			local p1 = puncher:getpos()
-			local p2 = object:getpos()
-			local tpos = get_target_pos(p1, p2, dir, 0)
-			shooter:spawn_particles(tpos, SHOOTER_EXPLOSION_TEXTURE)
-			object:punch(puncher, nil, SHOOTER_ARROW_TOOL_CAPS, dir)
-		end
-	end
-end
-
-local function stop_arrow(object, pos, stuck)
-	local acceleration = {x=0, y=-10, z=0}
-	if stuck == true then
-		pos = pos or object:getpos()
-		acceleration = {x=0, y=0, z=0}
-		object:moveto(pos)
-	end
-	object:set_properties({
-		physical = true,
-		collisionbox = {-1/8,-1/8,-1/8, 1/8,1/8,1/8},
-	})
-	object:setvelocity({x=0, y=0, z=0})
-	object:setacceleration(acceleration)
-end
-
 -- name is the overlay texture name, colour is used to select the wool texture
 local function get_texture(name, colour)
 	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
@@ -73,6 +45,36 @@ minetest.register_entity("shooter:arrow_entity", {
 	state = "init",
 	node_pos = nil,
 	collisionbox = {0,0,0, 0,0,0},
+	stop = function(self, pos)
+		local acceleration = {x=0, y=-10, z=0}
+		if self.state == "stuck" then
+			pos = pos or self.object:getpos()
+			acceleration = {x=0, y=0, z=0}
+		end
+		if pos then
+			self.object:moveto(pos)
+		end
+		self.object:set_properties({
+			physical = true,
+			collisionbox = {-1/8,-1/8,-1/8, 1/8,1/8,1/8},
+		})
+		self.object:setvelocity({x=0, y=0, z=0})
+		self.object:setacceleration(acceleration)
+	end,
+	strike = function(self, object)
+		local puncher = self.player
+		if puncher and shooter:is_valid_object(object) then
+			if puncher ~= object then
+				local dir = puncher:get_look_dir()
+				local p1 = puncher:getpos()
+				local p2 = object:getpos()
+				local tpos = get_target_pos(p1, p2, dir, 0)
+				shooter:spawn_particles(tpos, SHOOTER_EXPLOSION_TEXTURE)
+				object:punch(puncher, nil, SHOOTER_ARROW_TOOL_CAPS, dir)
+			end
+		end
+		self:stop(object:getpos())
+	end,
 	on_activate = function(self, staticdata)
 		self.object:set_armor_groups({immortal=1})
 		if staticdata == "expired" then
@@ -111,7 +113,7 @@ minetest.register_entity("shooter:arrow_entity", {
 						if item then
 							if not item.walkable then
 								self.state = "dropped"
-								stop_arrow(self.object)
+								self:stop()
 								return
 							end
 						end
@@ -144,7 +146,7 @@ minetest.register_entity("shooter:arrow_entity", {
 					local plane = {pos=opos, normal={x=-1, y=0, z=-1}}
 					local ipos = shooter:get_intersect_pos(ray, plane, collisionbox)
 					if ipos then
-						punch_object(self.player, obj)
+						self:strike(obj)
 					end
 				end
 			end
@@ -155,7 +157,7 @@ minetest.register_entity("shooter:arrow_entity", {
 				local tpos = get_target_pos(pos, npos, dir, 0.66)
 				self.node_pos = npos
 				self.state = "stuck"
-				stop_arrow(self.object, tpos, true)
+				self:stop(tpos)
 				shooter:play_node_sound(node, npos)
 			end
 			self.timer = 0
@@ -192,6 +194,8 @@ for _, color in pairs(dye_basecolors) do
 					ent = obj:get_luaentity()
 				end
 				if ent then
+					ent.player = ent.player or user
+					ent.state = "flight"
 					ent.color = color
 					obj:set_properties({
 						textures = {get_texture("arrow_uv", color)}
@@ -209,22 +213,21 @@ for _, color in pairs(dye_basecolors) do
 							pointed_thing.type = "node"
 						end
 						if pointed_thing.type == "object" then
-							punch_object(user, pointed_thing.ref)
+							ent:strike(pointed_thing.ref)
+							return itemstack
 						elseif pointed_thing.type == "node" then
 							local node = minetest.get_node(ppos)
 							local tpos = get_target_pos(pos, ppos, dir, 0.66)
 							minetest.after(0.2, function(object, pos, npos)
 								ent.node_pos = npos
 								ent.state = "stuck"
-								stop_arrow(object, pos, true)
+								ent:stop(pos)
 								shooter:play_node_sound(node, npos)
 							end, obj, tpos, ppos)
 							return itemstack
 						end
 					end
 					obj:setacceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
-					ent.player = ent.player or user
-					ent.state = "flight"
 				end
 			end
 			return itemstack
