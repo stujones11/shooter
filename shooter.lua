@@ -28,16 +28,12 @@ SHOOTER_OBJECT_UPDATE_TIME = 0.25
 SHOOTER_ROUNDS_UPDATE_TIME = 0.4
 SHOOTER_PLAYER_OFFSET = {x=0, y=1, z=0}
 SHOOTER_ENTITY_OFFSET = {x=0, y=0, z=0}
-SHOOTER_ENTITIES = {
-	"mobs:dirt_monster",
-	"mobs:stone_monster",
-	"mobs:sand_monster",
-	"mobs:tree_monster",
-	"mobs:sheep",
-	"mobs:rat",
-	"mobs:oerkki",
-	"mobs:dungeon_master",
-}
+SHOOTER_ENTITIES = {}
+for k, v in pairs(minetest.registered_entities) do
+	if string.find(k, "^mobs") then
+		table.insert(SHOOTER_ENTITIES, k)
+	end
+end
 
 local singleplayer = minetest.is_singleplayer()
 if singleplayer then
