@@ -68,8 +68,6 @@ minetest.register_entity("shooter:flare_entity", {
 						node.name ~= "default:water_flowing" then
 					minetest.place_node(pos, {name="shooter:flare_light"})
 					local meta = minetest.get_meta(pos)
-					meta:set_int("particle_id", id)
-					meta:set_int("init_time", os.time())
 					pos.y = pos.y - 0.1
 					local id = minetest.add_particlespawner(
 						1000, 30, pos, pos,
@@ -77,6 +75,8 @@ minetest.register_entity("shooter:flare_entity", {
 						{x=2, y=-2, z=-2}, {x=2, y=-2, z=2},
 						0.1, 0.75, 1, 8, false, "shooter_flare_particle.png"
 					)
+					meta:set_int("particle_id", id)
+					meta:set_int("init_time", os.time())
 					local sound = minetest.sound_play("shooter_flare_burn", {
 						object = self.player,
 						loop = true,
