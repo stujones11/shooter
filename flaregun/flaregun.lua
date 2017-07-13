@@ -1,11 +1,11 @@
-minetest.register_craftitem("shooter:flare", {
+minetest.register_craftitem("flaregun:flare", {
 	description = "Flare",
-	inventory_image = "shooter_flare_inv.png",
+	inventory_image = "flaregun_flare_inv.png",
 })
 
-minetest.register_node("shooter:flare_light", {
+minetest.register_node("flaregun:flare_light", {
 	drawtype = "glasslike",
-	tiles = {"shooter_flare_light.png"},
+	tiles = {"flaregun_flare_light.png"},
 	paramtype = "light",
 	groups = {not_in_creative_inventory=1},
 	drop = "",
@@ -17,7 +17,7 @@ minetest.register_node("shooter:flare_light", {
 })
 
 minetest.register_abm({
-	nodenames = "shooter:flare_light",
+	nodenames = "flaregun:flare_light",
 	interval = 5,
 	chance = 1,
 	action = function(pos, node)
@@ -34,18 +34,18 @@ minetest.register_abm({
 	end,
 })
 
-minetest.register_entity("shooter:flare_entity", {
+minetest.register_entity("flaregun:flare_entity", {
 	physical = true,
 	timer = 0,
 	visual = "cube",
 	visual_size = {x=1/8, y=1/8},
 	textures = {
-		"shooter_flare.png",
-		"shooter_flare.png",
-		"shooter_flare.png",
-		"shooter_flare.png",
-		"shooter_flare.png",
-		"shooter_flare.png",
+		"flaregun_flare.png",
+		"flaregun_flare.png",
+		"flaregun_flare.png",
+		"flaregun_flare.png",
+		"flaregun_flare.png",
+		"flaregun_flare.png",
 	},
 	player = nil,
 	collisionbox = {-1/16,-1/16,-1/16, 1/16,1/16,1/16},
@@ -66,18 +66,18 @@ minetest.register_entity("shooter:flare_entity", {
 				if minetest.get_node(pos).name == "air" and
 						node.name ~= "default:water_source" and
 						node.name ~= "default:water_flowing" then
-					minetest.place_node(pos, {name="shooter:flare_light"})
+					minetest.place_node(pos, {name="flaregun:flare_light"})
 					local meta = minetest.get_meta(pos)
 					pos.y = pos.y - 0.1
 					local id = minetest.add_particlespawner(
 						1000, 30, pos, pos,
 						{x=-1, y=1, z=-1}, {x=1, y=1, z=1},
 						{x=2, y=-2, z=-2}, {x=2, y=-2, z=2},
-						0.1, 0.75, 1, 8, false, "shooter_flare_particle.png"
+						0.1, 0.75, 1, 8, false, "flaregun_flare_particle.png"
 					)
 					meta:set_int("particle_id", id)
 					meta:set_int("init_time", os.time())
-					local sound = minetest.sound_play("shooter_flare_burn", {
+					local sound = minetest.sound_play("flaregun_flare_burn", {
 						object = self.player,
 						loop = true,
 					})
@@ -95,12 +95,12 @@ minetest.register_entity("shooter:flare_entity", {
 	end,
 })
 
-minetest.register_tool("shooter:flaregun", {
+minetest.register_tool("flaregun:flaregun", {
 	description = "Flare Gun",
-	inventory_image = "shooter_flaregun.png",
+	inventory_image = "flaregun_flaregun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
-		if not inv:contains_item("main", "shooter:flare") then
+		if not inv:contains_item("main", "flaregun:flare") then
 			minetest.sound_play("shooter_click", {object=user})
 			return itemstack
 		end
@@ -113,9 +113,9 @@ minetest.register_tool("shooter:flaregun", {
 		local yaw = user:get_look_yaw()
 		if pos and dir and yaw then
 			pos.y = pos.y + 1.5
-			local obj = minetest.add_entity(pos, "shooter:flare_entity")
+			local obj = minetest.add_entity(pos, "flaregun:flare_entity")
 			if obj then
-				minetest.sound_play("shooter_flare_fire", {object=obj})
+				minetest.sound_play("flaregun_flare_fire", {object=obj})
 				obj:setvelocity({x=dir.x * 16, y=dir.y * 16, z=dir.z * 16})
 				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 				obj:setyaw(yaw + math.pi)
@@ -131,13 +131,13 @@ minetest.register_tool("shooter:flaregun", {
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "shooter:flare",
+		output = "flaregun:flare",
 		recipe = {
 			{"tnt:gunpowder", "wool:red"},
 		},
 	})
 	minetest.register_craft({
-		output = "shooter:flaregun",
+		output = "flaregun:flaregun",
 		recipe = {
 			{"wool:red", "wool:red", "wool:red"},
 			{"", "", "default:steel_ingot"}
@@ -145,3 +145,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 	})
 end
 
+
+--Backwards compatibility
+minetest.register_alias("shooter:flaregun", "flaregun:flaregun")
+minetest.register_alias("shooter:flare", "flaregun:flare")
