@@ -8,7 +8,7 @@ local function throw_hook(itemstack, user, vel)
 			itemstack:add_wear(65535/100)
 		end
 		pos.y = pos.y + 1.5
-		local obj = minetest.add_entity(pos, "shooter:hook")
+		local obj = minetest.add_entity(pos, "shooter_hook:hook")
 		if obj then
 			minetest.sound_play("shooter_throw", {object=obj})
 			obj:setvelocity({x=dir.x * vel, y=dir.y * vel, z=dir.z * vel})
@@ -23,12 +23,12 @@ local function throw_hook(itemstack, user, vel)
 	end
 end
 
-minetest.register_entity("shooter:hook", {
+minetest.register_entity("shooter_hook:hook", {
 	physical = true,
 	timer = 0,
 	visual = "wielditem",
 	visual_size = {x=1/2, y=1/2},
-	textures = {"shooter:grapple_hook"},
+	textures = {"shooter_hook:grapple_hook"},
 	player = nil,
 	itemstack = "",
 	collisionbox = {-1/4,-1/4,-1/4, 1/4,1/4,1/4},
@@ -67,7 +67,7 @@ minetest.register_entity("shooter:hook", {
 	end,
 })
 
-minetest.register_tool("shooter:grapple_hook", {
+minetest.register_tool("shooter_hook:grapple_hook", {
 	description = "Grappling Hook",
 	inventory_image = "shooter_hook.png",
 	on_use = function(itemstack, user, pointed_thing)
@@ -79,17 +79,17 @@ minetest.register_tool("shooter:grapple_hook", {
 	end,
 })
 
-minetest.register_tool("shooter:grapple_gun", {
+minetest.register_tool("shooter_hook:grapple_gun", {
 	description = "Grappling Gun",
 	inventory_image = "shooter_hook_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
-		if inv:contains_item("main", "shooter:grapple_hook") and 
+		if inv:contains_item("main", "shooter_hook:grapple_hook") and 
 				inv:contains_item("main", "tnt:gunpowder") then
 			inv:remove_item("main", "tnt:gunpowder")
 			minetest.sound_play("shooter_reload", {object=user})
-			local stack = inv:remove_item("main", "shooter:grapple_hook")
-			itemstack = "shooter:grapple_gun_loaded 1 "..stack:get_wear()
+			local stack = inv:remove_item("main", "shooter_hook:grapple_hook")
+			itemstack = "shooter_hook:grapple_gun_loaded 1 "..stack:get_wear()
 		else
 			minetest.sound_play("shooter_click", {object=user})
 		end
@@ -97,7 +97,7 @@ minetest.register_tool("shooter:grapple_gun", {
 	end,
 })
 
-minetest.register_tool("shooter:grapple_gun_loaded", {
+minetest.register_tool("shooter_hook:grapple_gun_loaded", {
 	description = "Grappling Gun",
 	inventory_image = "shooter_hook_gun_loaded.png",
 	groups = {not_in_creative_inventory=1},
@@ -106,15 +106,15 @@ minetest.register_tool("shooter:grapple_gun_loaded", {
 			return itemstack
 		end
 		minetest.sound_play("shooter_pistol", {object=user})
-		itemstack = ItemStack("shooter:grapple_hook 1 "..itemstack:get_wear())
+		itemstack = ItemStack("shooter_hook:grapple_hook 1 "..itemstack:get_wear())
 		throw_hook(itemstack, user, 20)
-		return "shooter:grapple_gun"
+		return "shooter_hook:grapple_gun"
 	end,
 })
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "shooter:grapple_hook",
+		output = "shooter_hook:grapple_hook",
 		recipe = {
 			{"default:steel_ingot", "default:steel_ingot", "default:diamond"},
 			{"default:steel_ingot", "default:steel_ingot", ""},
@@ -122,7 +122,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 	minetest.register_craft({
-		output = "shooter:grapple_gun",
+		output = "shooter_hook:grapple_gun",
 		recipe = {
 			{"", "default:steel_ingot", "default:steel_ingot"},
 			{"", "", "default:diamond"},
@@ -130,3 +130,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 	})
 end
 
+--Backwards compatibility
+minetest.register_alias("shooter:grapple_hook", "shooter_hook:grapple_hook")
+minetest.register_alias("shooter:grapple_gun", "shooter_hook:grapple_gun")
+minetest.register_alias("shooter:grapple_gun_loaded", "shooter_hook:grapple_gun_loaded")
