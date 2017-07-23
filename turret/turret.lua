@@ -4,7 +4,7 @@ local function get_turret_entity(pos)
 	for _, obj in ipairs(objects) do
 		local ent = obj:get_luaentity()
 		if ent then
-			if ent.name == "shooter:turret_entity" then
+			if ent.name == "turret:turret_entity" then
 				-- Remove duplicates
 				if entity then
 					obj:remove()
@@ -17,7 +17,7 @@ local function get_turret_entity(pos)
 	return entity
 end
 
-minetest.register_entity("shooter:tnt_entity", {
+minetest.register_entity("turret:tnt_entity", {
 	physical = false,
 	timer = 0,
 	visual = "cube",
@@ -53,14 +53,14 @@ minetest.register_entity("shooter:tnt_entity", {
 	end,	
 })
 
-minetest.register_entity("shooter:turret_entity", {
+minetest.register_entity("turret:turret_entity", {
 	physical = true,
 	visual = "mesh",
-	mesh = "shooter_turret.b3d",
+	mesh = "turret_turret.b3d",
 	visual_size = {x=1, y=1},
 	collisionbox = {-0.3, 0.5,-0.3, 0.3,1,0.3},
 	textures = {
-		"shooter_turret_uv.png",
+		"turret_turret_uv.png",
 	},
 	timer = 0,
 	player = nil,
@@ -70,7 +70,7 @@ minetest.register_entity("shooter:turret_entity", {
 	on_activate = function(self, staticdata)
 		self.pos = self.object:getpos()
 		self.yaw = self.object:getyaw()
-		if minetest.get_node(self.pos).name ~= "shooter:turret" then
+		if minetest.get_node(self.pos).name ~= "turret:turret" then
 			self.object:remove()
 			return
 		end
@@ -147,7 +147,7 @@ minetest.register_entity("shooter:turret_entity", {
 			minetest.sound_play("shooter_click", {object=self.object})
 			return
 		end
-		minetest.sound_play("shooter_shotgun", {object=self.object})
+		minetest.sound_play("guns_shotgun", {object=self.object})
 		if not minetest.setting_getbool("creative_mode") then
 			inv:remove_item("main", "tnt:tnt")
 		end
@@ -160,11 +160,11 @@ minetest.register_entity("shooter:turret_entity", {
 		})
 		local pos = {x=self.pos.x, y=self.pos.y + 0.87, z=self.pos.z}
 		pos = vector.add(pos, {x=dir.x * 1.5, y=dir.y * 1.5, z=dir.z * 1.5})
-		local obj = minetest.add_entity(pos, "shooter:tnt_entity")
+		local obj = minetest.add_entity(pos, "turret:tnt_entity")
 		if obj then
 			local ent = obj:get_luaentity()
 			if ent then
-				minetest.sound_play("shooter_rocket_fire", {object=obj})
+				minetest.sound_play("rocket_rocket_fire", {object=obj})
 				ent.player = self.player
 				obj:setyaw(self.yaw)
 				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
@@ -183,11 +183,11 @@ minetest.register_entity("shooter:turret_entity", {
 	end
 })
 
-minetest.register_node("shooter:turret", {
+minetest.register_node("turret:turret", {
 	description = "Turret Gun",
-	tiles = {"shooter_turret_base.png"},
-	inventory_image = "shooter_turret_gun.png",
-	wield_image = "shooter_turret_gun.png",
+	tiles = {"turret_turret_base.png"},
+	inventory_image = "turret_turret_gun.png",
+	wield_image = "turret_turret_gun.png",
 	drawtype = "nodebox",
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -217,7 +217,7 @@ minetest.register_node("shooter:turret", {
 		local node = minetest.get_node({x=pos.x, y=pos.y + 1, z=pos.z})
 		if node.name == "air" then
 			if not get_turret_entity(pos) then
-				minetest.add_entity(pos, "shooter:turret_entity")
+				minetest.add_entity(pos, "turret:turret_entity")
 			end
 		end
 	end,
@@ -255,7 +255,7 @@ minetest.register_node("shooter:turret", {
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "shooter:turret",
+		output = "turret:turret",
 		recipe = {
 			{"default:bronze_ingot", "default:bronze_ingot", "default:steel_ingot"},
 			{"", "default:bronze_ingot", "default:steel_ingot"},
@@ -263,4 +263,8 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 end
+
+
+--Backward compatibility
+minetest.register_alias("shooter:turret", "turret:turret")
 

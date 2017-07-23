@@ -11,7 +11,5 @@ end
 if SHOOTER_ENABLE_GRENADES == true then
 	dofile(modpath.."/grenade.lua")
 end
-if SHOOTER_ENABLE_TURRETS == true then
-	dofile(modpath.."/turret.lua")
-end
+
 
