@@ -8,8 +8,6 @@ end
 if SHOOTER_ENABLE_HOOK == true then
 	dofile(modpath.."/grapple.lua")
 end
-if SHOOTER_ENABLE_GRENADES == true then
-	dofile(modpath.."/grenade.lua")
-end
+
 
 
