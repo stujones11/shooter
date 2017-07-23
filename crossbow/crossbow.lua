@@ -2,7 +2,7 @@ SHOOTER_CROSSBOW_USES = 50
 SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=2}}
 SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
 
-minetest.register_alias("shooter:arrow", "shooter:arrow_white")
+minetest.register_alias("crossbow:arrow", "crossbow:arrow_white")
 minetest.register_alias("shooter:crossbow_loaded", "shooter:crossbow_loaded_white")
 
 local dye_basecolors = (dye and dye.basecolors) or
@@ -27,13 +27,13 @@ end
 
 -- name is the overlay texture name, colour is used to select the wool texture
 local function get_texture(name, colour)
-	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
+	return "crossbow_"..name..".png^wool_"..colour..".png^crossbow_"..name..".png^[makealpha:255,126,126"
 end
 
-minetest.register_entity("shooter:arrow_entity", {
+minetest.register_entity("crossbow:arrow_entity", {
 	physical = false,
 	visual = "mesh",
-	mesh = "shooter_arrow.b3d",
+	mesh = "crossbow_arrow.b3d",
 	visual_size = {x=1, y=1},
 	textures = {
 		get_texture("arrow_uv", "white"),
@@ -84,7 +84,7 @@ minetest.register_entity("shooter:arrow_entity", {
 	on_punch = function(self, puncher)
 		if puncher then
 			if puncher:is_player() then
-				local stack = "shooter:arrow_"..self.color
+				local stack = "crossbow:arrow_"..self.color
 				local inv = puncher:get_inventory()
 				if inv:room_for_item("main", stack) then
 					inv:add_item("main", stack)
@@ -169,11 +169,11 @@ minetest.register_entity("shooter:arrow_entity", {
 })
 
 for _, color in pairs(dye_basecolors) do
-	minetest.register_craftitem("shooter:arrow_"..color, {
+	minetest.register_craftitem("crossbow:arrow_"..color, {
 		description = color:gsub("%a", string.upper, 1).." Arrow",
 		inventory_image = get_texture("arrow_inv", color),
 	})
-	minetest.register_tool("shooter:crossbow_loaded_"..color, {
+	minetest.register_tool("crossbow:crossbow_loaded_"..color, {
 		description = "Crossbow",
 		inventory_image = get_texture("crossbow_loaded", color),
 		groups = {not_in_creative_inventory=1},
@@ -182,13 +182,13 @@ for _, color in pairs(dye_basecolors) do
 			if not minetest.setting_getbool("creative_mode") then
 				itemstack:add_wear(65535/SHOOTER_CROSSBOW_USES)
 			end
-			itemstack = "shooter:crossbow 1 "..itemstack:get_wear()
+			itemstack = "crossbow:crossbow 1 "..itemstack:get_wear()
 			local pos = user:getpos()
 			local dir = user:get_look_dir()
 			local yaw = user:get_look_yaw()
 			if pos and dir and yaw then
 				pos.y = pos.y + 1.5
-				local obj = minetest.add_entity(pos, "shooter:arrow_entity")
+				local obj = minetest.add_entity(pos, "crossbow:arrow_entity")
 				local ent = nil
 				if obj then
 					ent = obj:get_luaentity()
@@ -235,27 +235,27 @@ for _, color in pairs(dye_basecolors) do
 	})
 end
 
-minetest.register_tool("shooter:crossbow", {
+minetest.register_tool("crossbow:crossbow", {
 	description = "Crossbow",
-	inventory_image = "shooter_crossbow.png",
+	inventory_image = "crossbow_crossbow.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
 		local stack = inv:get_stack("main", user:get_wield_index() + 1)
-		local color = string.match(stack:get_name(), "shooter:arrow_(%a+)")
+		local color = string.match(stack:get_name(), "crossbow:arrow_(%a+)")
 		if color then
 			minetest.sound_play("shooter_reload", {object=user})
 			if not minetest.setting_getbool("creative_mode") then
-				inv:remove_item("main", "shooter:arrow_"..color.." 1")
+				inv:remove_item("main", "crossbow:arrow_"..color.." 1")
 			end
-			return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
+			return "crossbow:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
 		end
 		for _, color in pairs(dye_basecolors) do
-			if inv:contains_item("main", "shooter:arrow_"..color) then
+			if inv:contains_item("main", "crossbow:arrow_"..color) then
 				minetest.sound_play("shooter_reload", {object=user})
 				if not minetest.setting_getbool("creative_mode") then
-					inv:remove_item("main", "shooter:arrow_"..color.." 1")
+					inv:remove_item("main", "crossbow:arrow_"..color.." 1")
 				end
-				return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
+				return "crossbow:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
 			end
 		end
 		minetest.sound_play("shooter_click", {object=user})
@@ -264,7 +264,7 @@ minetest.register_tool("shooter:crossbow", {
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "shooter:crossbow",
+		output = "crossbow:crossbow",
 		recipe = {
 			{"default:stick", "default:stick", "default:stick"},
 			{"default:stick", "default:stick", ""},
@@ -272,7 +272,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 	minetest.register_craft({
-		output = "shooter:arrow_white",
+		output = "crossbow:arrow_white",
 		recipe = {
 			{"default:steel_ingot", "", ""},
 			{"", "default:stick", "default:paper"},
@@ -282,12 +282,19 @@ if SHOOTER_ENABLE_CRAFTING == true then
 	for _, color in pairs(dye_basecolors) do
 		if color ~= "white" then
 			minetest.register_craft({
-				output = "shooter:arrow_"..color,
+				output = "crossbow:arrow_"..color,
 				recipe = {
-					{"", "dye:"..color, "shooter:arrow_white"},
+					{"", "dye:"..color, "crossbow:arrow_white"},
 				},
 			})
 		end
 	end
 end
 
+
+--Backwards compatibility
+minetest.register_alias("shooter:crossbow", "crossbow:crossbow")
+for _, color in pairs(dye_basecolors) do
+	minetest.register_alias("shooter:arrow_"..color, "crossbow:arrow_"..color)
+	minetest.register_alias("shooter:crossbow_loaded_"..color, "crossbow:crossbow_loaded_"..color)
+end
