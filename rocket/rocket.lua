@@ -116,6 +116,5 @@ end
 minetest.register_alias("shooter:rocket", "rocket:rocket")
 minetest.register_alias("shooter:rocket_gun", "rocket:rocket_gun")
 minetest.register_alias("shooter:rocket_gun_loaded", "rocket:rocket_gun_loaded")
-minetest.register_alias("shooter:rocket_entity", "rocket:rocket_entity")
 
 

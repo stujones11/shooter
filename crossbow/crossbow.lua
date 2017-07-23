@@ -294,7 +294,6 @@ end
 
 --Backwards compatibility
 minetest.register_alias("shooter:crossbow", "crossbow:crossbow")
-minetest.register_alias("shooter:arrow_entity", "crossbow:arrow_entity")
 for _, color in pairs(dye_basecolors) do
 	minetest.register_alias("shooter:arrow_"..color, "crossbow:arrow_"..color)
 	minetest.register_alias("shooter:crossbow_loaded_"..color, "crossbow:crossbow_loaded_"..color)
