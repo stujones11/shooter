@@ -2,9 +2,6 @@ local modpath = minetest.get_modpath(minetest.get_current_modname())
 
 dofile(modpath.."/api.lua")
 
-if SHOOTER_ENABLE_GUNS == true then
-	dofile(modpath.."/guns.lua")
-end
 if SHOOTER_ENABLE_FLARES == true then
 	dofile(modpath.."/flaregun.lua")
 end
