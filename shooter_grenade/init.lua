@@ -4,12 +4,12 @@ minetest.register_entity("shooter_grenade:grenade_entity", {
 	visual = "cube",
 	visual_size = {x=1/8, y=1/8},
 	textures = {
-		"grenade_grenade.png",
-		"grenade_grenade.png",
-		"grenade_grenade.png",
-		"grenade_grenade.png",
-		"grenade_grenade.png",
-		"grenade_grenade.png",
+		"shooter_grenade.png",
+		"shooter_grenade.png",
+		"shooter_grenade.png",
+		"shooter_grenade.png",
+		"shooter_grenade.png",
+		"shooter_grenade.png",
 	},
 	player = nil,
 	collisionbox = {0,0,0, 0,0,0},
@@ -37,7 +37,7 @@ minetest.register_entity("shooter_grenade:grenade_entity", {
 
 minetest.register_tool("shooter_grenade:grenade", {
 	description = "Grenade",
-	inventory_image = "grenade_hand_grenade.png",
+	inventory_image = "shooter_hand_grenade.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if not minetest.setting_getbool("creative_mode") then
 			itemstack = ""

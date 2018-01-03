@@ -27,13 +27,13 @@ end
 
 -- name is the overlay texture name, colour is used to select the wool texture
 local function get_texture(name, colour)
-	return "crossbow_"..name..".png^wool_"..colour..".png^crossbow_"..name..".png^[makealpha:255,126,126"
+	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
 end
 
 minetest.register_entity("shooter_crossbow:arrow_entity", {
 	physical = false,
 	visual = "mesh",
-	mesh = "crossbow_arrow.b3d",
+	mesh = "shooter_arrow.b3d",
 	visual_size = {x=1, y=1},
 	textures = {
 		get_texture("arrow_uv", "white"),
@@ -237,7 +237,7 @@ end
 
 minetest.register_tool("shooter_crossbow:crossbow", {
 	description = "Crossbow",
-	inventory_image = "crossbow_crossbow.png",
+	inventory_image = "shooter_crossbow.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
 		local stack = inv:get_stack("main", user:get_wield_index() + 1)

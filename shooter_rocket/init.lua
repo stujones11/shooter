@@ -1,7 +1,7 @@
 minetest.register_craftitem("shooter_rocket:rocket", {
 	description = "Rocket",
     stack_max = 1,
-	inventory_image = "rocket_rocket_inv.png",
+	inventory_image = "shooter_rocket_inv.png",
 })
 
 minetest.register_entity("shooter_rocket:rocket_entity", {
@@ -43,7 +43,7 @@ minetest.register_entity("shooter_rocket:rocket_entity", {
 
 minetest.register_tool("shooter_rocket:rocket_gun_loaded", {
 	description = "Rocket Gun",
-	inventory_image = "rocket_rocket_gun_loaded.png",
+	inventory_image = "shooter_rocket_gun_loaded.png",
 	groups = {not_in_creative_inventory=1},
 	on_use = function(itemstack, user, pointed_thing)
 		if not minetest.setting_getbool("creative_mode") then
@@ -64,7 +64,7 @@ minetest.register_tool("shooter_rocket:rocket_gun_loaded", {
 			pos.y = pos.y + 1.5
 			local obj = minetest.add_entity(pos, "shooter_rocket:rocket_entity")
 			if obj then
-				minetest.sound_play("rocket_rocket_fire", {object=obj})
+				minetest.sound_play("shooter_rocket_fire", {object=obj})
 				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
 				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 				obj:setyaw(yaw + math.pi)
@@ -80,7 +80,7 @@ minetest.register_tool("shooter_rocket:rocket_gun_loaded", {
 
 minetest.register_tool("shooter_rocket:rocket_gun", {
 	description = "Rocket Gun",
-	inventory_image = "rocket_rocket_gun.png",
+	inventory_image = "shooter_rocket_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
 		if inv:contains_item("main", "shooter_rocket:rocket") then

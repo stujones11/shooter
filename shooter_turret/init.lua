@@ -56,11 +56,11 @@ minetest.register_entity("shooter_turret:tnt_entity", {
 minetest.register_entity("shooter_turret:turret_entity", {
 	physical = true,
 	visual = "mesh",
-	mesh = "turret_turret.b3d",
+	mesh = "shooter_turret.b3d",
 	visual_size = {x=1, y=1},
 	collisionbox = {-0.3, 0.5,-0.3, 0.3,1,0.3},
 	textures = {
-		"turret_turret_uv.png",
+		"shooter_turret_uv.png",
 	},
 	timer = 0,
 	player = nil,
@@ -164,7 +164,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 		if obj then
 			local ent = obj:get_luaentity()
 			if ent then
-				minetest.sound_play("rocket_rocket_fire", {object=obj})
+				minetest.sound_play("shooter_rocket_fire", {object=obj})
 				ent.player = self.player
 				obj:setyaw(self.yaw)
 				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
@@ -185,9 +185,9 @@ minetest.register_entity("shooter_turret:turret_entity", {
 
 minetest.register_node("shooter_turret:turret", {
 	description = "Turret Gun",
-	tiles = {"turret_turret_base.png"},
-	inventory_image = "turret_turret_gun.png",
-	wield_image = "turret_turret_gun.png",
+	tiles = {"shooter_turret_base.png"},
+	inventory_image = "shooter_turret_gun.png",
+	wield_image = "shooter_turret_gun.png",
 	drawtype = "nodebox",
 	paramtype = "light",
 	paramtype2 = "facedir",

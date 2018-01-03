@@ -69,7 +69,7 @@ minetest.register_entity("shooter_hook:hook", {
 
 minetest.register_tool("shooter_hook:grapple_hook", {
 	description = "Grappling Hook",
-	inventory_image = "hook_hook.png",
+	inventory_image = "shooter_hook.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "nothing" then
 			return itemstack
@@ -81,7 +81,7 @@ minetest.register_tool("shooter_hook:grapple_hook", {
 
 minetest.register_tool("shooter_hook:grapple_gun", {
 	description = "Grappling Gun",
-	inventory_image = "hook_hook_gun.png",
+	inventory_image = "shooter_hook_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
 		if inv:contains_item("main", "shooter_hook:grapple_hook") and 
@@ -99,13 +99,13 @@ minetest.register_tool("shooter_hook:grapple_gun", {
 
 minetest.register_tool("shooter_hook:grapple_gun_loaded", {
 	description = "Grappling Gun",
-	inventory_image = "hook_hook_gun_loaded.png",
+	inventory_image = "shooter_hook_gun_loaded.png",
 	groups = {not_in_creative_inventory=1},
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "nothing" then
 			return itemstack
 		end
-		minetest.sound_play("guns_pistol", {object=user})
+		minetest.sound_play("shooter_pistol", {object=user})
 		itemstack = ItemStack("shooter_hook:grapple_hook 1 "..itemstack:get_wear())
 		throw_hook(itemstack, user, 20)
 		return "shooter_hook:grapple_gun"

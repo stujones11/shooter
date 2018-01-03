@@ -1,11 +1,11 @@
 minetest.register_craftitem("shooter_flaregun:flare", {
 	description = "Flare",
-	inventory_image = "flaregun_flare_inv.png",
+	inventory_image = "shooter_flare_inv.png",
 })
 
 minetest.register_node("shooter_flaregun:flare_light", {
 	drawtype = "glasslike",
-	tiles = {"flaregun_flare_light.png"},
+	tiles = {"shooter_flare_light.png"},
 	paramtype = "light",
 	groups = {not_in_creative_inventory=1},
 	drop = "",
@@ -40,12 +40,12 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 	visual = "cube",
 	visual_size = {x=1/8, y=1/8},
 	textures = {
-		"flaregun_flare.png",
-		"flaregun_flare.png",
-		"flaregun_flare.png",
-		"flaregun_flare.png",
-		"flaregun_flare.png",
-		"flaregun_flare.png",
+		"shooter_flare.png",
+		"shooter_flare.png",
+		"shooter_flare.png",
+		"shooter_flare.png",
+		"shooter_flare.png",
+		"shooter_flare.png",
 	},
 	player = nil,
 	collisionbox = {-1/16,-1/16,-1/16, 1/16,1/16,1/16},
@@ -73,11 +73,11 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 						1000, 30, pos, pos,
 						{x=-1, y=1, z=-1}, {x=1, y=1, z=1},
 						{x=2, y=-2, z=-2}, {x=2, y=-2, z=2},
-						0.1, 0.75, 1, 8, false, "flaregun_flare_particle.png"
+						0.1, 0.75, 1, 8, false, "shooter_flare_particle.png"
 					)
 					meta:set_int("particle_id", id)
 					meta:set_int("init_time", os.time())
-					local sound = minetest.sound_play("flaregun_flare_burn", {
+					local sound = minetest.sound_play("shooter_flare_burn", {
 						object = self.player,
 						loop = true,
 					})
@@ -97,7 +97,7 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 
 minetest.register_tool("shooter_flaregun:flaregun", {
 	description = "Flare Gun",
-	inventory_image = "flaregun_flaregun.png",
+	inventory_image = "shooter_flaregun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
 		if not inv:contains_item("main", "shooter_flaregun:flare") then
@@ -115,7 +115,7 @@ minetest.register_tool("shooter_flaregun:flaregun", {
 			pos.y = pos.y + 1.5
 			local obj = minetest.add_entity(pos, "shooter_flaregun:flare_entity")
 			if obj then
-				minetest.sound_play("flaregun_flare_fire", {object=obj})
+				minetest.sound_play("shooter_flare_fire", {object=obj})
 				obj:setvelocity({x=dir.x * 16, y=dir.y * 16, z=dir.z * 16})
 				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 				obj:setyaw(yaw + math.pi)
