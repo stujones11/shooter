@@ -253,6 +253,17 @@ minetest.register_node("shooter_turret:turret", {
 	},
 })
 
+minetest.register_abm({
+	nodenames = {"shooter_turret:turret"},
+	interval = 15,
+	chance = 1,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		if not get_turret_entity(pos) then
+			minetest.add_entity(pos, "shooter_turret:turret_entity")
+		end
+	end
+})
+
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
 		output = "shooter_turret:turret",
