@@ -1,4 +1,4 @@
-minetest.register_entity("grenade:grenade_entity", {
+minetest.register_entity("shooter_grenade:grenade_entity", {
 	physical = false,
 	timer = 0,
 	visual = "cube",
@@ -35,7 +35,7 @@ minetest.register_entity("grenade:grenade_entity", {
 	end,
 })
 
-minetest.register_tool("grenade:grenade", {
+minetest.register_tool("shooter_grenade:grenade", {
 	description = "Grenade",
 	inventory_image = "grenade_hand_grenade.png",
 	on_use = function(itemstack, user, pointed_thing)
@@ -54,7 +54,7 @@ minetest.register_tool("grenade:grenade", {
 		local yaw = user:get_look_yaw()
 		if pos and dir then
 			pos.y = pos.y + 1.5
-			local obj = minetest.add_entity(pos, "grenade:grenade_entity")
+			local obj = minetest.add_entity(pos, "shooter_grenade:grenade_entity")
 			if obj then
 				obj:setvelocity({x=dir.x * 15, y=dir.y * 15, z=dir.z * 15})
 				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
@@ -71,7 +71,7 @@ minetest.register_tool("grenade:grenade", {
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "grenade:grenade",
+		output = "shooter_grenade:grenade",
 		recipe = {
 			{"tnt:gunpowder", "default:steel_ingot"},
 		},
@@ -80,4 +80,4 @@ end
 
 
 --Backwards compatibility
-minetest.register_alias("shooter:grenade", "grenade:grenade")
+minetest.register_alias("shooter:grenade", "shooter_grenade:grenade")

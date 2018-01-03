@@ -1,10 +1,10 @@
-minetest.register_craftitem("rocket:rocket", {
+minetest.register_craftitem("shooter_rocket:rocket", {
 	description = "Rocket",
     stack_max = 1,
 	inventory_image = "rocket_rocket_inv.png",
 })
 
-minetest.register_entity("rocket:rocket_entity", {
+minetest.register_entity("shooter_rocket:rocket_entity", {
 	physical = false,
 	timer = 0,
 	visual = "cube",
@@ -41,7 +41,7 @@ minetest.register_entity("rocket:rocket_entity", {
 	end,
 })
 
-minetest.register_tool("rocket:rocket_gun_loaded", {
+minetest.register_tool("shooter_rocket:rocket_gun_loaded", {
 	description = "Rocket Gun",
 	inventory_image = "rocket_rocket_gun_loaded.png",
 	groups = {not_in_creative_inventory=1},
@@ -49,7 +49,7 @@ minetest.register_tool("rocket:rocket_gun_loaded", {
 		if not minetest.setting_getbool("creative_mode") then
 			itemstack:add_wear(65535/50)
 		end
-		itemstack = "rocket:rocket_gun 1 "..itemstack:get_wear()
+		itemstack = "shooter_rocket:rocket_gun 1 "..itemstack:get_wear()
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
 			if vector.distance(user:getpos(), pointed) < 8 then
@@ -62,7 +62,7 @@ minetest.register_tool("rocket:rocket_gun_loaded", {
 		local yaw = user:get_look_yaw()
 		if pos and dir and yaw then
 			pos.y = pos.y + 1.5
-			local obj = minetest.add_entity(pos, "rocket:rocket_entity")
+			local obj = minetest.add_entity(pos, "shooter_rocket:rocket_entity")
 			if obj then
 				minetest.sound_play("rocket_rocket_fire", {object=obj})
 				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
@@ -78,17 +78,17 @@ minetest.register_tool("rocket:rocket_gun_loaded", {
 	end,
 })
 
-minetest.register_tool("rocket:rocket_gun", {
+minetest.register_tool("shooter_rocket:rocket_gun", {
 	description = "Rocket Gun",
 	inventory_image = "rocket_rocket_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
-		if inv:contains_item("main", "rocket:rocket") then
+		if inv:contains_item("main", "shooter_rocket:rocket") then
 			minetest.sound_play("shooter_reload", {object=user})
 			if not minetest.setting_getbool("creative_mode") then
-				inv:remove_item("main", "rocket:rocket 1")
+				inv:remove_item("main", "shooter_rocket:rocket 1")
 			end
-			itemstack = "rocket:rocket_gun_loaded 1 "..itemstack:get_wear()
+			itemstack = "shooter_rocket:rocket_gun_loaded 1 "..itemstack:get_wear()
 		else
 			minetest.sound_play("shooter_click", {object=user})
 		end
@@ -98,14 +98,14 @@ minetest.register_tool("rocket:rocket_gun", {
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "rocket:rocket_gun",
+		output = "shooter_rocket:rocket_gun",
 		recipe = {
 			{"default:bronze_ingot", "default:steel_ingot", "default:steel_ingot"},
 			{"", "", "default:diamond"},
 		},
 	})
 	minetest.register_craft({
-		output = "rocket:rocket",
+		output = "shooter_rocket:rocket",
 		recipe = {
 			{"default:bronze_ingot", "tnt:gunpowder", "default:bronze_ingot"},
 		},
@@ -113,8 +113,8 @@ if SHOOTER_ENABLE_CRAFTING == true then
 end
 
 --Backwards compatibility
-minetest.register_alias("shooter:rocket", "rocket:rocket")
-minetest.register_alias("shooter:rocket_gun", "rocket:rocket_gun")
-minetest.register_alias("shooter:rocket_gun_loaded", "rocket:rocket_gun_loaded")
+minetest.register_alias("shooter:rocket", "shooter_rocket:rocket")
+minetest.register_alias("shooter:rocket_gun", "shooter_rocket:rocket_gun")
+minetest.register_alias("shooter:rocket_gun_loaded", "shooter_rocket:rocket_gun_loaded")
 
 

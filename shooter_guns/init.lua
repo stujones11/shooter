@@ -1,4 +1,4 @@
-shooter:register_weapon("guns:pistol", {
+shooter:register_weapon("shooter_guns:pistol", {
 	description = "Pistol",
 	inventory_image = "guns_pistol.png",
 	rounds = 200,
@@ -12,7 +12,7 @@ shooter:register_weapon("guns:pistol", {
 	},
 })
 
-shooter:register_weapon("guns:rifle", {
+shooter:register_weapon("shooter_guns:rifle", {
 	description = "Rifle",
 	inventory_image = "guns_rifle.png",
 	rounds = 100,
@@ -26,7 +26,7 @@ shooter:register_weapon("guns:rifle", {
 	},
 })
 
-shooter:register_weapon("guns:shotgun", {
+shooter:register_weapon("shooter_guns:shotgun", {
 	description = "Shotgun",
 	inventory_image = "guns_shotgun.png",
 	rounds = 50,
@@ -40,7 +40,7 @@ shooter:register_weapon("guns:shotgun", {
 	},
 })
 
-shooter:register_weapon("guns:machine_gun", {
+shooter:register_weapon("shooter_guns:machine_gun", {
 	description = "Sub Machine Gun",
 	inventory_image = "guns_smgun.png",
 	rounds = 50,
@@ -55,21 +55,21 @@ shooter:register_weapon("guns:machine_gun", {
 	},
 })
 
-minetest.register_craftitem("guns:ammo", {
+minetest.register_craftitem("shooter_guns:ammo", {
 	description = "Ammo pack",
 	inventory_image = "guns_ammo.png",
 })
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
-		output = "guns:pistol 1 65535",
+		output = "shooter_guns:pistol 1 65535",
 		recipe = {
 			{"default:steel_ingot", "default:steel_ingot"},
 			{"", "default:mese_crystal"},
 		},
 	})
 	minetest.register_craft({
-		output = "guns:rifle 1 65535",
+		output = "shooter_guns:rifle 1 65535",
 		recipe = {
 			{"default:steel_ingot", "", ""},
 			{"", "default:bronze_ingot", ""},
@@ -77,7 +77,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 	minetest.register_craft({
-		output = "guns:shotgun 1 65535",
+		output = "shooter_guns:shotgun 1 65535",
 		recipe = {
 			{"default:steel_ingot", "", ""},
 			{"", "default:steel_ingot", ""},
@@ -85,15 +85,15 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 	minetest.register_craft({
-		output = "guns:machine_gun 1 65535",
+		output = "shooter_guns:machine_gun 1 65535",
 		recipe = {
-			{"guns:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
+			{"shooter_guns:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
 			{"", "default:bronze_ingot", "default:mese_crystal"},
 			{"", "default:bronze_ingot", ""},
 		},
 	})
 	minetest.register_craft({
-		output = "guns:ammo",
+		output = "shooter_guns:ammo",
 		recipe = {
 			{"tnt:gunpowder", "default:bronze_ingot"},
 		},
@@ -127,8 +127,8 @@ end)
 
 
 --Backwards compatibility
-minetest.register_alias("shooter:shotgun", "guns:shotgun")
-minetest.register_alias("shooter:pistol", "guns:pistol")
-minetest.register_alias("shooter:machine_gun", "guns:machine_gun")
-minetest.register_alias("shooter:rifle", "guns:rifle")
-minetest.register_alias("shooter:ammo", "guns:ammo")
+minetest.register_alias("shooter:shotgun", "shooter_guns:shotgun")
+minetest.register_alias("shooter:pistol", "shooter_guns:pistol")
+minetest.register_alias("shooter:machine_gun", "shooter_guns:machine_gun")
+minetest.register_alias("shooter:rifle", "shooter_guns:rifle")
+minetest.register_alias("shooter:ammo", "shooter_guns:ammo")

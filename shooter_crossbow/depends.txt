@@ -1,5 +1,2 @@
-default
-tnt
 wool
 shooter
-

@@ -1,6 +1,0 @@
-default
-tnt
-guns
-rocket
-shooter
-
