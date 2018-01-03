@@ -147,7 +147,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 			minetest.sound_play("shooter_click", {object=self.object})
 			return
 		end
-		minetest.sound_play("guns_shotgun", {object=self.object})
+		minetest.sound_play("shooter_shotgun", {object=self.object})
 		if not minetest.setting_getbool("creative_mode") then
 			inv:remove_item("main", "tnt:tnt")
 		end
