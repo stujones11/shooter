@@ -171,7 +171,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 			end
 		end
-		if SHOOTER_ENABLE_PARTICLE_FX == true then
+		if shooter.config.enable_particle_fx == true then
 			minetest.add_particlespawner(10, 0.1,
 				{x=pos.x - 1, y=pos.y - 1, z=pos.z - 1},
 				{x=pos.x + 1, y=pos.y + 1, z=pos.z + 1},
@@ -264,7 +264,7 @@ minetest.register_abm({
 	end
 })
 
-if SHOOTER_ENABLE_CRAFTING == true then
+if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_turret:turret",
 		recipe = {
@@ -274,7 +274,6 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 end
-
 
 --Backward compatibility
 minetest.register_alias("shooter:turret", "shooter_turret:turret")
