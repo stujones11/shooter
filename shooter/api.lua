@@ -5,62 +5,28 @@ shooter = {
 	shots = {},
 	update_time = 0,
 	reload_time = 0,
+	player_offset = {x=0, y=1, z=0},
+	entity_offset = {x=0, y=0, z=0},
 }
 
-SHOOTER_ADMIN_WEAPONS = false
-SHOOTER_ENABLE_BLASTING = false
-SHOOTER_ENABLE_CROSSBOW = true
-SHOOTER_ENABLE_GUNS = true
-SHOOTER_ENABLE_FLARES = true
-SHOOTER_ENABLE_HOOK = true
-SHOOTER_ENABLE_GRENADES = true
-SHOOTER_ENABLE_ROCKETS = true
-SHOOTER_ENABLE_TURRETS = true
-SHOOTER_ENABLE_CRAFTING = true
-SHOOTER_ENABLE_PARTICLE_FX = true
-SHOOTER_ENABLE_PROTECTION = false
-SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
-SHOOTER_ALLOW_NODES = true
-SHOOTER_ALLOW_ENTITIES = false
-SHOOTER_ALLOW_PLAYERS = true
-SHOOTER_OBJECT_RELOAD_TIME = 1
-SHOOTER_OBJECT_UPDATE_TIME = 0.25
-SHOOTER_ROUNDS_UPDATE_TIME = 0.4
-SHOOTER_PLAYER_OFFSET = {x=0, y=1, z=0}
-SHOOTER_ENTITY_OFFSET = {x=0, y=0, z=0}
-SHOOTER_ENTITIES = {}
-for k, v in pairs(minetest.registered_entities) do
-	if string.find(k, "^mobs") then
-		table.insert(SHOOTER_ENTITIES, k)
-	end
-end
+shooter.config = {
+	admin_weapons = false,
+	enable_blasting = false,
+	enable_particle_fx = true,
+	enable_protection = false,
+	enable_crafting = true,
+	explosion_texture = "shooter_hit.png",
+	allow_nodes = true,
+	allow_entities = false,
+	allow_players = true,
+	object_reload_time = 1,
+	object_update_time = 0.25,
+	rounds_update_time = 0.4,
+}
 
+local config = shooter.config
 local singleplayer = minetest.is_singleplayer()
-if singleplayer then
-	SHOOTER_ENABLE_BLASTING = true
-	SHOOTER_ALLOW_ENTITIES = true
-	SHOOTER_ALLOW_PLAYERS = false
-end
-
-local modpath = minetest.get_modpath(minetest.get_current_modname())
-local worldpath = minetest.get_worldpath()
-local input = io.open(modpath.."/shooter.conf", "r")
-if input then
-	dofile(modpath.."/shooter.conf")
-	input:close()
-	input = nil
-end
-input = io.open(worldpath.."/shooter.conf", "r")
-if input then
-	dofile(worldpath.."/shooter.conf")
-	input:close()
-	input = nil
-end
-
 local allowed_entities = {}
-for _,v in ipairs(SHOOTER_ENTITIES) do
-	allowed_entities[v] = 1
-end
 
 local function get_dot_product(v1, v2)
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
@@ -70,10 +36,14 @@ local function get_particle_pos(p, v, d)
 	return vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
 end
 
+function shooter:set_shootable_entity(name)
+	allowed_entities[name] = 1
+end
+
 function shooter:spawn_particles(pos, texture)
-	if SHOOTER_ENABLE_PARTICLE_FX == true then
+	if config.enable_particle_fx == true then
 		if type(texture) ~= "string" then
-			texture = SHOOTER_EXPLOSION_TEXTURE
+			texture = config.explosion_texture
 		end
 		local spread = {x=0.1, y=0.1, z=0.1}
 		minetest.add_particlespawner(15, 0.3,
@@ -107,7 +77,7 @@ function shooter:punch_node(pos, def)
 	if not item then
 		return
 	end
-	if SHOOTER_ENABLE_PROTECTION then
+	if config.enable_protection then
 		if minetest.is_protected(pos, def.name) then
 			return
 		end
@@ -132,9 +102,9 @@ end
 function shooter:is_valid_object(object)
 	if object then
 		if object:is_player() == true then
-			return SHOOTER_ALLOW_PLAYERS
+			return config.allow_players
 		end
-		if SHOOTER_ALLOW_ENTITIES == true then
+		if config.allow_entities == true then
 			local luaentity = object:get_luaentity()
 			if luaentity then
 				if luaentity.name then
@@ -190,14 +160,14 @@ function shooter:process_round(round)
 			local user = minetest.get_player_by_name(round.name)
 			if user then
 				target.object:punch(user, nil, round.def.tool_caps, v1)
-				shooter:spawn_particles(target.pos, SHOOTER_EXPLOSION_TEXTURE)
+				shooter:spawn_particles(target.pos, config.explosion_texture)
 			end
 			return 1
-		elseif pos and SHOOTER_ALLOW_NODES == true then
+		elseif pos and config.allow_nodes == true then
 			shooter:punch_node(pos, round.def)
 			return 1
 		end
-	elseif SHOOTER_ALLOW_NODES == true then
+	elseif config.allow_nodes == true then
 		local d = round.def.step
 		local p2 = vector.add(p1, vector.multiply(v1, {x=d, y=d, z=d}))
 		local success, pos = minetest.line_of_sight(p1, p2, 1)
@@ -267,7 +237,7 @@ function shooter:fire_weapon(user, pointed_thing, def)
 		{x=0, y=0, z=0}, 0.5, 0.25,
 		false, def.particle
 	)
-	if pointed_thing.type == "node" and SHOOTER_ALLOW_NODES == true then
+	if pointed_thing.type == "node" and config.allow_nodes == true then
 		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
 		shooter:punch_node(pos, def)
 	elseif pointed_thing.type == "object" then
@@ -277,7 +247,7 @@ function shooter:fire_weapon(user, pointed_thing, def)
 			local p2 = object:getpos()
 			local pp = get_particle_pos(p1, v1, vector.distance(p1, p2))
 			pp.y = pp.y + 1.75
-			shooter:spawn_particles(pp, SHOOTER_EXPLOSION_TEXTURE)
+			shooter:spawn_particles(pp, config.explosion_texture)
 		end
 	else
 		shooter:update_objects()
@@ -293,7 +263,7 @@ end
 
 function shooter:load_objects()
 	local objects = {}
-	if SHOOTER_ALLOW_PLAYERS == true then
+	if config.allow_players == true then
 		local players = minetest.get_connected_players()
 		for _,player in ipairs(players) do
 			local pos = player:getpos()
@@ -305,12 +275,12 @@ function shooter:load_objects()
 					object = player,
 					pos = pos,
 					collisionbox = {-0.25,-1.0,-0.25, 0.25,0.8,0.25},
-					offset = SHOOTER_PLAYER_OFFSET,
+					offset = shooter.player_offset,
 				})
 			end
 		end
 	end
-	if SHOOTER_ALLOW_ENTITIES == true then
+	if config.allow_entities == true then
 		for _,ref in pairs(minetest.luaentities) do
 			if ref.object and ref.name then
 				if allowed_entities[ref.name] then
@@ -323,7 +293,7 @@ function shooter:load_objects()
 							object = ref.object,
 							pos = pos,
 							collisionbox = def.collisionbox or {0,0,0, 0,0,0},
-							offset = SHOOTER_ENTITY_OFFSET,
+							offset = shooter.entity_offset,
 						})
 					end
 				end
@@ -339,9 +309,9 @@ function shooter:load_objects()
 end
 
 function shooter:update_objects()
-	if shooter.time - shooter.reload_time > SHOOTER_OBJECT_RELOAD_TIME then
+	if shooter.time - shooter.reload_time > config.object_reload_time then
 		shooter:load_objects()
-	elseif shooter.time - shooter.update_time > SHOOTER_OBJECT_UPDATE_TIME then
+	elseif shooter.time - shooter.update_time > config.object_update_time then
 		for i, ref in ipairs(shooter.objects) do
 			if ref.object then
 				local pos = ref.object:getpos()
@@ -365,8 +335,8 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
 	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
-	if SHOOTER_ALLOW_NODES and SHOOTER_ENABLE_BLASTING then
-		if SHOOTER_ENABLE_PROTECTION then
+	if config.allow_nodes and config.enable_blasting then
+		if config.enable_protection then
 			if not minetest.is_protected(pos, name) then
 				minetest.set_node(pos, {name="tnt:boom"})
 			end
@@ -374,7 +344,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			minetest.set_node(pos, {name="tnt:boom"})
 		end
 	end
-	if SHOOTER_ENABLE_PARTICLE_FX == true then
+	if config.enable_particle_fx == true then
 		minetest.add_particlespawner(50, 0.1,
 			p1, p2, {x=-0, y=-0, z=-0}, {x=0, y=0, z=0},
 			{x=-0.5, y=5, z=-0.5}, {x=0.5, y=5, z=0.5},
@@ -383,8 +353,8 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	end
 	local objects = minetest.get_objects_inside_radius(pos, distance)
 	for _,obj in ipairs(objects) do
-		if (obj:is_player() and SHOOTER_ALLOW_PLAYERS == true) or
-				(obj:get_luaentity() and SHOOTER_ALLOW_ENTITIES == true and
+		if (obj:is_player() and config.allow_players == true) or
+				(obj:get_luaentity() and config.allow_entities == true and
 				obj:get_luaentity().name ~= "__builtin:item") then
 			local obj_pos = obj:getpos()
 			local dist = vector.distance(obj_pos, pos)
@@ -401,7 +371,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			end
 		end
 	end
-	if SHOOTER_ALLOW_NODES and SHOOTER_ENABLE_BLASTING then
+	if config.allow_nodes and config.enable_blasting then
 		local pr = PseudoRandom(os.time())
 		local vm = VoxelManip()
 		local min, max = vm:read_from_map(p1, p2)
@@ -415,7 +385,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 				for x = -radius, radius do
 					if (x * x) + (y * y) + (z * z) <=
 							(radius * radius) + pr:next(-radius, radius) then
-						if SHOOTER_ENABLE_PROTECTION then
+						if config.enable_protection then
 							if not minetest.is_protected(vp, name) then
 								data[vi] = c_air
 							end
@@ -434,7 +404,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	end
 end
 
-if not singleplayer and SHOOTER_ADMIN_WEAPONS then
+if not singleplayer and config.admin_weapons then
 	local timer = 0
 	local shooting = false
 	minetest.register_globalstep(function(dtime)

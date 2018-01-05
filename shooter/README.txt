@@ -13,11 +13,48 @@ to produce an accurate and server-firendly method of hit detection.
 By default this mod is configured to work only against other players in
 multiplayer mode and against Simple Mobs [mobs] in singleplayer mode.
 
-Default configuration can be customised by adding a shooter.conf file to
-the mod's main directory, see shooter.conf.example for more details.
+Configuration
+=============
 
-This is still very much a work in progress which I eventually plan to use
-as the base for a 'Spades' style FPS game using the minetest engine.
+Override the following default settings by adding them to your minetest.conf file.
+
+-- Enable admin super weapons
+-- This lets admins shoot guns automatically after 2 seconds without munition.
+shooter_admin_weapons = false
+
+-- Enable node destruction with explosives
+shooter_enable_blasting = true
+
+-- Enable Crafting
+shooter_enable_crafting = true
+
+-- Enable particle effects
+shooter_enable_particle_fx = true
+
+-- Enable protection mod support, requires a protection mod that utilizes
+-- minetest.is_protected(), tested with TenPlus1's version of [protector]
+shooter_enable_protection = false
+
+-- Particle texture used when a player or entity is hit
+shooter_explosion = "shooter_hit.png"
+
+-- Allow node destruction
+shooter_allow_nodes = true
+
+-- Allow entities in multiplayer mode
+shooter_allow_entities = false
+
+-- Allow players in multiplayer mode
+shooter_allow_players = true
+
+-- How often objects are fully reloaded
+shooter_object_reload_time = 1
+
+-- How often object positions are updated
+shooter_object_update_time = 0.25
+
+-- How often rounds are processed
+shooter_rounds_update_time = 0.4
 
 Crafting
 ========

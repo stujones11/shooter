@@ -1,12 +1,31 @@
-SHOOTER_CROSSBOW_USES = 50
-SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=2}}
-SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
+local config = {
+	crossbow_uses = 50,
+	arrow_lifetime = 180,
+}
+
+-- Legacy Config Support
+
+for name, _ in pairs(config) do
+	local global = "SHOOTER_"..name:upper()
+	if minetest.global_exists(global) then
+		config[name] = _G[global]
+	end
+	local setting = minetest.settings:get("shooter_"..name)
+	if type(setting) == "string" then
+		config[name] = tonumber(setting)
+	end
+end
+
+local arrow_tool_caps = {damage_groups={fleshy=2}}
+if minetest.global_exists("SHOOTER_ARROW_TOOL_CAPS") then
+	arrow_tool_caps = table.copy(SHOOTER_ARROW_TOOL_CAPS)
+end
 
 minetest.register_alias("shooter_crossbow:arrow", "shooter_crossbow:arrow_white")
 minetest.register_alias("shooter:crossbow_loaded", "shooter:crossbow_loaded_white")
 
 local dye_basecolors = (dye and dye.basecolors) or
-		{"white", "grey", "black", "red", "yellow", "green", "cyan", "blue", "magenta"}
+	{"white", "grey", "black", "red", "yellow", "green", "cyan", "blue", "magenta"}
 
 local function get_animation_frame(dir)
 	local angle = math.atan(dir.y)
@@ -40,7 +59,7 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 	},
 	color = "white",
 	timer = 0,
-	lifetime = SHOOTER_ARROW_LIFETIME,
+	lifetime = config.arrow_lifetime,
 	player = nil,
 	state = "init",
 	node_pos = nil,
@@ -69,8 +88,8 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 				local p1 = puncher:getpos()
 				local p2 = object:getpos()
 				local tpos = get_target_pos(p1, p2, dir, 0)
-				shooter:spawn_particles(tpos, SHOOTER_EXPLOSION_TEXTURE)
-				object:punch(puncher, nil, SHOOTER_ARROW_TOOL_CAPS, dir)
+				shooter:spawn_particles(tpos, shooter.config.explosion_texture)
+				object:punch(puncher, nil, arrow_tool_caps, dir)
 			end
 		end
 		self:stop(object:getpos())
@@ -132,9 +151,9 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 			for _,obj in ipairs(objects) do
 				if shooter:is_valid_object(obj) and obj ~= self.player then
 					local collisionbox = {-0.25,-1.0,-0.25, 0.25,0.8,0.25}
-					local offset = SHOOTER_PLAYER_OFFSET
+					local offset = shooter.player_offset
 					if not obj:is_player() then
-						offset = SHOOTER_ENTITY_OFFSET
+						offset = shooter.entity_offset
 						local ent = obj:get_luaentity()
 						if ent then
 							local def = minetest.registered_entities[ent.name]
@@ -180,7 +199,7 @@ for _, color in pairs(dye_basecolors) do
 		on_use = function(itemstack, user, pointed_thing)
 			minetest.sound_play("shooter_click", {object=user})
 			if not minetest.setting_getbool("creative_mode") then
-				itemstack:add_wear(65535/SHOOTER_CROSSBOW_USES)
+				itemstack:add_wear(65535/config.crossbow_uses)
 			end
 			itemstack = "shooter_crossbow:crossbow 1 "..itemstack:get_wear()
 			local pos = user:getpos()
@@ -262,7 +281,7 @@ minetest.register_tool("shooter_crossbow:crossbow", {
 	end,
 })
 
-if SHOOTER_ENABLE_CRAFTING == true then
+if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_crossbow:crossbow",
 		recipe = {

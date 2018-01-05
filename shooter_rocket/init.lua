@@ -96,7 +96,7 @@ minetest.register_tool("shooter_rocket:rocket_gun", {
 	end,
 })
 
-if SHOOTER_ENABLE_CRAFTING == true then
+if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_rocket:rocket_gun",
 		recipe = {

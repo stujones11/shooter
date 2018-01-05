@@ -60,7 +60,7 @@ minetest.register_craftitem("shooter_guns:ammo", {
 	inventory_image = "shooter_ammo.png",
 })
 
-if SHOOTER_ENABLE_CRAFTING == true then
+if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_guns:pistol 1 65535",
 		recipe = {
@@ -104,7 +104,7 @@ local rounds_update_time = 0
 
 minetest.register_globalstep(function(dtime)
 	shooter.time = shooter.time + dtime
-	if shooter.time - rounds_update_time > SHOOTER_ROUNDS_UPDATE_TIME then
+	if shooter.time - rounds_update_time > shooter.config.rounds_update_time then
 		for i, round in ipairs(shooter.rounds) do
 			if shooter:process_round(round) or round.dist > round.def.range then
 				table.remove(shooter.rounds, i)

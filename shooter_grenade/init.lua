@@ -69,7 +69,7 @@ minetest.register_tool("shooter_grenade:grenade", {
 	end,
 })
 
-if SHOOTER_ENABLE_CRAFTING == true then
+if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_grenade:grenade",
 		recipe = {
@@ -77,7 +77,6 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 end
-
 
 --Backwards compatibility
 minetest.register_alias("shooter:grenade", "shooter_grenade:grenade")
