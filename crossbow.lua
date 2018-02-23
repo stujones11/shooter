@@ -27,7 +27,7 @@ end
 
 -- name is the overlay texture name, colour is used to select the wool texture
 local function get_texture(name, colour)
-	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
+	return "wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
 end
 
 minetest.register_entity("shooter:arrow_entity", {
