@@ -184,6 +184,13 @@ function shooter:register_weapon(name, def)
 	local shots = def.shots or 1
 	local wear = math.ceil(65534 / def.rounds)
 	local max_wear = (def.rounds - 1) * wear
+	-- Fix sounds table
+	def.sounds = def.sounds or {}
+	-- Default sounds
+	def.sounds.reload = def.sounds.reload or "shooter_reload"
+	def.sounds.fail_shot = def.sounds.fail_shot or "shooter_click"
+	-- Assert reload item
+	def.reload_item = def.reload_item or "shooter:ammo"
 	minetest.register_tool(name, {
 		description = def.description,
 		inventory_image = def.inventory_image,
@@ -204,19 +211,53 @@ function shooter:register_weapon(name, def)
 			else
 				local inv = user:get_inventory()
 				if inv then
-					local stack = "shooter:ammo 1"
+					local stack = def.reload_item .. " 1"
 					if inv:contains_item("main", stack) then
-						minetest.sound_play("shooter_reload", {object=user})
+						minetest.sound_play((def.sounds.reload), {object=user})
 						inv:remove_item("main", stack)
-						itemstack:replace(name.." 1 1")
+						if def.unloaded_item then
+							itemstack:replace(def.unloaded_item.name.." 1 1")
+						else
+							itemstack:replace(name.." 1 1")
+						end
 					else
-						minetest.sound_play("shooter_click", {object=user})
+						minetest.sound_play((def.sounds.fail_shot), {object=user})
 					end
 				end
+			end
+			-- Replace to unloaded item
+			if def.unloaded_item and (itemstack:get_wear() + wear) > 65534 then
+				itemstack:set_name(def.unloaded_item.name)
 			end
 			return itemstack
 		end,
 	})
+	-- Register unloaded item tool
+	if def.unloaded_item then
+		local groups = {}
+		if def.unloaded_item.not_in_creative_inventory == true then
+			groups = {not_in_creative_inventory=1}
+		end
+		minetest.register_tool(def.unloaded_item.name, {
+			description = def.unloaded_item.description,
+			inventory_image = def.unloaded_item.inventory_image,
+			groups = groups,
+			on_use = function(itemstack, user, pointed_thing)
+				local inv = user:get_inventory()
+				if inv then
+					local stack = def.reload_item .. " 1"
+					if inv:contains_item("main", stack) then
+						minetest.sound_play((def.sounds.reload), {object=user})
+						inv:remove_item("main", stack)
+						itemstack:replace(name.." 1 1")
+					else
+						minetest.sound_play((def.sounds.fail_shot), {object=user})
+					end
+				end
+				return itemstack
+			end,
+		})
+	end
 end
 
 function shooter:fire_weapon(user, pointed_thing, def)
