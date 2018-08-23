@@ -50,7 +50,11 @@ Definition tables
         inventory_image = "guns_rifle.png", -- Inventory imagem for the weapon item
         
         rounds = 100, --[[ Amount of shots 
-            ^ Refilled only by "shooter:ammo" item ]]
+            ^ Refilled only by the defined reload item ]]
+        
+        reload_item = "itemstring", --[[ Reload Item
+            ^ If omitted, "shooter:ammo" is used ]]
+        
         
         spec = { -- Weapon Aspects
         

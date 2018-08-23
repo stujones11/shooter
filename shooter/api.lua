@@ -184,6 +184,8 @@ function shooter:register_weapon(name, def)
 	local shots = def.shots or 1
 	local wear = math.ceil(65534 / def.rounds)
 	local max_wear = (def.rounds - 1) * wear
+	-- Assert reload item
+	def.reload_item = def.reload_item or "shooter:ammo"
 	minetest.register_tool(name, {
 		description = def.description,
 		inventory_image = def.inventory_image,
@@ -204,7 +206,7 @@ function shooter:register_weapon(name, def)
 			else
 				local inv = user:get_inventory()
 				if inv then
-					local stack = "shooter:ammo 1"
+					local stack = def.reload_item .. " 1"
 					if inv:contains_item("main", stack) then
 						minetest.sound_play("shooter_reload", {object=user})
 						inv:remove_item("main", stack)
