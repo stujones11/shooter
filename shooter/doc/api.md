@@ -55,6 +55,12 @@ Definition tables
         reload_item = "itemstring", --[[ Reload Item
             ^ If omitted, "shooter:ammo" is used ]]
         
+        unloaded_item = { -- OPTIONAL | Item to be registered for unloaded weapon item
+        	name = "itemstring", -- Itemstring to be registered
+        	description = "Rifle (Unloaded)", -- Weapon description name
+        	inventory_image = "guns_rifle_unloaded.png", -- Inventory imagem for the unloaded weapon item
+        	not_in_creative_inventory = true, -- OPTIONAL | If true, does not display unloaded item in creative inventory
+        },
         
         spec = { -- Weapon Aspects
         

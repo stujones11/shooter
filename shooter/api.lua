@@ -215,15 +215,49 @@ function shooter:register_weapon(name, def)
 					if inv:contains_item("main", stack) then
 						minetest.sound_play((def.sounds.reload), {object=user})
 						inv:remove_item("main", stack)
-						itemstack:replace(name.." 1 1")
+						if def.unloaded_item then
+							itemstack:replace(def.unloaded_item.name.." 1 1")
+						else
+							itemstack:replace(name.." 1 1")
+						end
 					else
 						minetest.sound_play((def.sounds.fail_shot), {object=user})
 					end
 				end
 			end
+			-- Replace to unloaded item
+			if def.unloaded_item and (itemstack:get_wear() + wear) > 65534 then
+				itemstack:set_name(def.unloaded_item.name)
+			end
 			return itemstack
 		end,
 	})
+	-- Register unloaded item tool
+	if def.unloaded_item then
+		local groups = {}
+		if def.unloaded_item.not_in_creative_inventory == true then
+			groups = {not_in_creative_inventory=1}
+		end
+		minetest.register_tool(def.unloaded_item.name, {
+			description = def.unloaded_item.description,
+			inventory_image = def.unloaded_item.inventory_image,
+			groups = groups,
+			on_use = function(itemstack, user, pointed_thing)
+				local inv = user:get_inventory()
+				if inv then
+					local stack = def.reload_item .. " 1"
+					if inv:contains_item("main", stack) then
+						minetest.sound_play((def.sounds.reload), {object=user})
+						inv:remove_item("main", stack)
+						itemstack:replace(name.." 1 1")
+					else
+						minetest.sound_play((def.sounds.fail_shot), {object=user})
+					end
+				end
+				return itemstack
+			end,
+		})
+	end
 end
 
 function shooter:fire_weapon(user, pointed_thing, def)
