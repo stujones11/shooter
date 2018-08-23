@@ -28,13 +28,16 @@ as the base for a 'Spades' style FPS game using the minetest engine.
 
 Register a Weapon
 -----------------
-The API works with some variables into Lua Entity that represent a NPC, 
-then you should initialize the Lua Entity before that it really assume 
-a controled behavior.
+The API works with tools and items that represent a weapon, 
+then you should register the weapon and another support items (like ammo).
 
 ### Methods
-* `shooter:register_weapon(weapon_name, {Weapon Definitions})`
+* `shooter:register_weapon(weapon_name, {Weapon Definitions})`: Register a weapon item
   `weapon_name` is the itemstring for a tool to be registered
+
+Global Tables
+-------------
+* `shooter.registered_weapons`: Registered weapons by itemstring
 
 Definition tables
 -----------------
