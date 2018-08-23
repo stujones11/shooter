@@ -73,7 +73,11 @@ Definition tables
             	oddly_breakable_by_hand=2
             },
             
-            sound = "guns_rifle", -- Sound file for shot fire 
+            sounds = { -- Sound files
+            	shot = "guns_rifle", -- When weapon shoots (if omitted, "guns_rifle" is used)
+            	reload = "shooter_reload", -- When reload weapon (if omitted, "shooter_reload" is used)
+            	fail_shot = "shooter_click", -- When the weapon fail by unloaded (if omitted, "shooter_click" is used)
+            },
             
             particle = "shooter_bullet.png", -- Particle texture file name for projectile
         },
