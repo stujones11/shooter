@@ -30,25 +30,6 @@ for name, _ in pairs(shooter.config) do
 		shooter.config[name] = _G[global]
 	end
 end
-if minetest.global_exists("SHOOTER_PLAYER_OFFSET") then
-	shooter.player_offset = SHOOTER_PLAYER_OFFSET
-end
-if minetest.global_exists("SHOOTER_ENTITY_OFFSET") then
-	shooter.entity_offset = SHOOTER_ENTITY_OFFSET
-end
-if minetest.global_exists("SHOOTER_ENTITIES") then
-	for _, name in pairs(SHOOTER_ENTITIES) do
-		shooter:set_shootable_entity(name)
-	end
-end
-
--- Simple Mobs Support
-
-for name, _ in pairs(minetest.registered_entities) do
-	if string.find(name, "^mobs") then
-		shooter:set_shootable_entity(name)
-	end
-end
 
 -- Load Configuration
 
