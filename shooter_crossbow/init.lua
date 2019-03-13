@@ -143,42 +143,27 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 			return
 		end
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
 			local dir = vector.normalize(self.object:getvelocity())
 			local frame = get_animation_frame(dir)
-			self.object:set_animation({x=frame, y=frame}, 0)
-			local objects = minetest.get_objects_inside_radius(pos, 5)
-			for _,obj in ipairs(objects) do
-				if shooter:is_valid_object(obj) and obj ~= self.player then
-					local collisionbox = {-0.25,-1.0,-0.25, 0.25,0.8,0.25}
-					local offset = shooter.player_offset
-					if not obj:is_player() then
-						offset = shooter.entity_offset
-						local ent = obj:get_luaentity()
-						if ent then
-							local def = minetest.registered_entities[ent.name]
-							collisionbox = def.collisionbox or collisionbox
-						end
-					end
-					local opos = vector.add(obj:getpos(), offset)
-					local ray = {pos=pos, dir=dir}
-					local plane = {pos=opos, normal={x=-1, y=0, z=-1}}
-					local ipos = shooter:get_intersect_pos(ray, plane, collisionbox)
-					if ipos then
-						self:strike(obj)
-					end
+			local p1 = vector.add(self.object:getpos(), dir)
+			local p2 = vector.add(p1, vector.multiply(dir, 4))
+			local ray = minetest.raycast(p1, p2, true, true)
+			local pointed_thing = ray:next() or {}
+			if pointed_thing.type == "object" then
+				local obj = pointed_thing.ref
+				if shooter:is_valid_object(obj) then
+					self:strike(obj)
 				end
-			end
-			local p = vector.add(pos, vector.multiply(dir, {x=5, y=5, z=5}))
-			local _, npos = minetest.line_of_sight(pos, p, 1)
-			if npos then
-				local node = minetest.get_node(npos)
-				local tpos = get_target_pos(pos, npos, dir, 0.66)
-				self.node_pos = npos
+			elseif pointed_thing.type == "node" then
+				local pos = minetest.get_pointed_thing_position(pointed_thing, false)
+				local node = minetest.get_node(pos)
+				local target_pos = get_target_pos(p1, pos, dir, 0.66)
+				self.node_pos = pos
 				self.state = "stuck"
-				self:stop(tpos)
-				shooter:play_node_sound(node, npos)
+				self:stop(target_pos)
+				shooter:play_node_sound(node, pos)
 			end
+			self.object:set_animation({x=frame, y=frame}, 0)
 			self.timer = 0
 		end
 	end,
@@ -206,7 +191,8 @@ for _, color in pairs(dye_basecolors) do
 			local dir = user:get_look_dir()
 			local yaw = user:get_look_yaw()
 			if pos and dir and yaw then
-				pos.y = pos.y + 1.5
+				pos.y = pos.y + shooter.config.camera_height
+				pos = vector.add(pos, dir)
 				local obj = minetest.add_entity(pos, "shooter_crossbow:arrow_entity")
 				local ent = nil
 				if obj then
@@ -309,7 +295,6 @@ if shooter.config.enable_crafting == true then
 		end
 	end
 end
-
 
 --Backwards compatibility
 minetest.register_alias("shooter:crossbow", "shooter_crossbow:crossbow")

@@ -1,9 +1,9 @@
 shooter:register_weapon("shooter_guns:pistol", {
 	description = "Pistol",
 	inventory_image = "shooter_pistol.png",
-	rounds = 200,
 	spec = {
-		range = 100,
+		rounds = 200,
+		range = 160,
 		step = 20,
 		tool_caps = {full_punch_interval=0.5, damage_groups={fleshy=2}},
 		groups = {snappy=3, fleshy=3, oddly_breakable_by_hand=3},
@@ -15,9 +15,9 @@ shooter:register_weapon("shooter_guns:pistol", {
 shooter:register_weapon("shooter_guns:rifle", {
 	description = "Rifle",
 	inventory_image = "shooter_rifle.png",
-	rounds = 100,
 	spec = {
-		range = 200,
+		rounds = 100,
+		range = 240,
 		step = 30,
 		tool_caps = {full_punch_interval=1.0, damage_groups={fleshy=3}},
 		groups = {snappy=3, crumbly=3, choppy=3, fleshy=2, oddly_breakable_by_hand=2},
@@ -29,9 +29,9 @@ shooter:register_weapon("shooter_guns:rifle", {
 shooter:register_weapon("shooter_guns:shotgun", {
 	description = "Shotgun",
 	inventory_image = "shooter_shotgun.png",
-	rounds = 50,
 	spec = {
-		range = 50,
+		rounds = 50,
+		range = 60,
 		step = 15,
 		tool_caps = {full_punch_interval=1.5, damage_groups={fleshy=4}},
 		groups = {cracky=3, snappy=2, crumbly=2, choppy=2, fleshy=1, oddly_breakable_by_hand=1},
@@ -43,12 +43,12 @@ shooter:register_weapon("shooter_guns:shotgun", {
 shooter:register_weapon("shooter_guns:machine_gun", {
 	description = "Sub Machine Gun",
 	inventory_image = "shooter_smgun.png",
-	rounds = 50,
-	shots = 4,
 	spec = {
-		range = 100,
+		automatic = true,
+		rounds = 100,
+		range = 160,
 		step = 20,
-		tool_caps = {full_punch_interval=0.125, damage_groups={fleshy=2}},
+		tool_caps = {full_punch_interval=0.1, damage_groups={fleshy=2}},
 		groups = {snappy=3, fleshy=3, oddly_breakable_by_hand=3},
 		sound = "shooter_pistol",
 		particle = "shooter_cap.png",
@@ -99,32 +99,6 @@ if shooter.config.enable_crafting == true then
 		},
 	})
 end
-
-local rounds_update_time = 0
-
-minetest.register_globalstep(function(dtime)
-	shooter.time = shooter.time + dtime
-	if shooter.time - rounds_update_time > shooter.config.rounds_update_time then
-		for i, round in ipairs(shooter.rounds) do
-			if shooter:process_round(round) or round.dist > round.def.range then
-				table.remove(shooter.rounds, i)
-			else
-				local v = vector.multiply(round.ray, round.def.step)
-				shooter.rounds[i].pos = vector.add(round.pos, v)
-				shooter.rounds[i].dist = round.dist + round.def.step
-			end
-		end
-		rounds_update_time = shooter.time
-	end
-	if shooter.time > 100000 then
-		shooter.shots = {}
-		rounds_update_time = 0
-		shooter.reload_time = 0
-		shooter.update_time = 0
-		shooter.time = 0
-	end
-end)
-
 
 --Backwards compatibility
 minetest.register_alias("shooter:shotgun", "shooter_guns:shotgun")
