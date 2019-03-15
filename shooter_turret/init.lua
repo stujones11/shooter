@@ -1,3 +1,5 @@
+local use_player_api = minetest.get_modpath("player_api")
+
 local function get_turret_entity(pos)
 	local entity = nil
 	local objects = minetest.get_objects_inside_radius(pos, 1)
@@ -17,42 +19,6 @@ local function get_turret_entity(pos)
 	return entity
 end
 
-minetest.register_entity("shooter_turret:tnt_entity", {
-	physical = false,
-	timer = 0,
-	visual = "cube",
-	visual_size = {x=1/4, y=1/4},
-	textures = {
-		"tnt_top.png",
-		"tnt_bottom.png",
-		"tnt_side.png",
-		"tnt_side.png",
-		"tnt_side.png",
-		"tnt_side.png",
-	},
-	player = nil,
-	collisionbox = {0,0,0, 0,0,0},
-	on_activate = function(self, staticdata)
-		if staticdata == "expired" then
-			self.object:remove()
-		end
-	end,
-	on_step = function(self, dtime)
-		self.timer = self.timer + dtime
-		if self.timer > 0.2 then
-			local pos = self.object:getpos()
-			if minetest.get_node(pos).name ~= "air" then
-				self.object:remove()
-				shooter:blast(pos, 4, 80, 10, self.player)
-			end
-			self.timer = 0
-		end
-	end,
-	get_staticdata = function(self)
-		return "expired"
-	end,	
-})
-
 minetest.register_entity("shooter_turret:turret_entity", {
 	physical = true,
 	visual = "mesh",
@@ -63,13 +29,13 @@ minetest.register_entity("shooter_turret:turret_entity", {
 		"shooter_turret_uv.png",
 	},
 	timer = 0,
-	player = nil,
+	user = nil,
 	pitch = 40,
 	yaw = 0,
 	firing = false,
 	on_activate = function(self, staticdata)
-		self.pos = self.object:getpos()
-		self.yaw = self.object:getyaw()
+		self.pos = self.object:get_pos()
+		self.yaw = self.object:get_yaw()
 		if minetest.get_node(self.pos).name ~= "shooter_turret:turret" then
 			self.object:remove()
 			return
@@ -80,23 +46,36 @@ minetest.register_entity("shooter_turret:turret_entity", {
 		get_turret_entity(self.pos)
 	end,
 	on_rightclick = function(self, clicker)
-		if self.player then
-			self.player:set_detach()
-			self.player = nil
+		if self.user then
+			local player = minetest.get_player_by_name(self.user)
+			if player then
+				player:set_detach()
+				if use_player_api then
+					player_api.player_attached[self.user] = false
+				end
+			end
+			self.user = nil
 		else
-			clicker:set_attach(self.object, "", {x=0,y=5,z=-8}, {x=0,y=0,z=0})
-			self.player = clicker
+			clicker:set_attach(self.object, "", {x=0,y=-5,z=-8}, {x=0,y=0,z=0})
+			self.user = clicker:get_player_name()
+			if use_player_api then
+				player_api.player_attached[self.user] = true
+			end
 		end
 	end,
 	on_step = function(self, dtime)
-		self.timer = self.timer + dtime
-		if self.timer < 0.1 then
+		if not self.user then
 			return
-		end	
-		if self.player then
+		end
+		self.timer = self.timer + dtime
+		if self.timer < 0.2 then
+			return
+		end
+		local player = minetest.get_player_by_name(self.user)
+		if player then
 			local pitch = self.pitch
-			local yaw = self.object:getyaw()
-			local ctrl = self.player:get_player_control()
+			local yaw = self.object:get_yaw()
+			local ctrl = player:get_player_control()
 			local step = 2
 			if ctrl then
 				if ctrl.sneak then
@@ -130,7 +109,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 					self.pitch = pitch
 				end
 				if self.yaw ~= yaw then
-					self.object:setyaw(yaw)
+					self.object:set_yaw(yaw)
 					self.yaw = yaw
 				end
 			end
@@ -138,19 +117,20 @@ minetest.register_entity("shooter_turret:turret_entity", {
 		self.timer = 0
 	end,
 	fire = function(self)
+		if not self.user then
+			return
+		end
 		local meta = minetest.get_meta(self.pos)
 		local inv = meta:get_inventory()
 		if not inv then
 			return
 		end
-		if not inv:contains_item("main", "tnt:tnt") then
+		if not inv:contains_item("main", "shooter_rocket:rocket") then
 			minetest.sound_play("shooter_click", {object=self.object})
 			return
 		end
+		inv:remove_item("main", "shooter_rocket:rocket")
 		minetest.sound_play("shooter_shotgun", {object=self.object})
-		if not minetest.setting_getbool("creative_mode") then
-			inv:remove_item("main", "tnt:tnt")
-		end
 		local pitch = math.rad(self.pitch - 40)
 		local len = math.cos(pitch)
 		local dir = vector.normalize({
@@ -159,26 +139,35 @@ minetest.register_entity("shooter_turret:turret_entity", {
 			z = len * math.cos(self.yaw),
 		})
 		local pos = {x=self.pos.x, y=self.pos.y + 0.87, z=self.pos.z}
-		pos = vector.add(pos, {x=dir.x * 1.5, y=dir.y * 1.5, z=dir.z * 1.5})
-		local obj = minetest.add_entity(pos, "shooter_turret:tnt_entity")
+		pos = vector.add(pos, vector.multiply(dir, 1.5))
+		local obj = minetest.add_entity(pos, "shooter_rocket:rocket_entity")
 		if obj then
 			local ent = obj:get_luaentity()
 			if ent then
 				minetest.sound_play("shooter_rocket_fire", {object=obj})
-				ent.player = self.player
-				obj:setyaw(self.yaw)
-				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				ent.user = self.user
+				obj:set_yaw(self.yaw)
+				obj:set_velocity(vector.multiply(dir, 30))
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 			end
 		end
 		if shooter.config.enable_particle_fx == true then
-			minetest.add_particlespawner(10, 0.1,
-				{x=pos.x - 1, y=pos.y - 1, z=pos.z - 1},
-				{x=pos.x + 1, y=pos.y + 1, z=pos.z + 1},
-				{x=0, y=0, z=0}, {x=0, y=0, z=0},
-				{x=-0.5, y=-0.5, z=-0.5}, {x=0.5, y=0.5, z=0.5},
-				0.1, 1, 8, 15, false, "tnt_smoke.png"
-			)
+			minetest.add_particlespawner({
+				amount = 10,
+				time = 0.1,
+				minpos = {x=pos.x - 1, y=pos.y - 1, z=pos.z - 1},
+				maxpos = {x=pos.x + 1, y=pos.y + 1, z=pos.z + 1},
+				minvel = {x=0, y=0, z=0},
+				maxvel = {x=0, y=0, z=0},
+				minacc = {x=-0.5, y=-0.5, z=-0.5},
+				maxacc = {x=0.5, y=0.5, z=0.5},
+				minexptime = 0.1,
+				maxexptime = 1,
+				minsize = 8,
+				maxsize = 15,
+				collisiondetection = false,
+				texture = "tnt_smoke.png",
+			})
 		end
 	end
 })
@@ -191,7 +180,7 @@ minetest.register_node("shooter_turret:turret", {
 	drawtype = "nodebox",
 	paramtype = "light",
 	paramtype2 = "facedir",
-	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=3},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=3},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -207,7 +196,8 @@ minetest.register_node("shooter_turret:turret", {
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", "size[8,9]"..
 			"list[current_name;main;2,0;4,4;]"..
-			"list[current_player;main;0,5;8,4;]"
+			"list[current_player;main;0,5;8,4;]"..
+			"listring[]"
 		)
 		meta:set_string("infotext", "Turret Gun")
 		local inv = meta:get_inventory()

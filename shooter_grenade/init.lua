@@ -11,7 +11,7 @@ minetest.register_entity("shooter_grenade:grenade_entity", {
 		"shooter_grenade.png",
 		"shooter_grenade.png",
 	},
-	player = nil,
+	user = nil,
 	collisionbox = {0,0,0, 0,0,0},
 	on_activate = function(self, staticdata)
 		if staticdata == "expired" then
@@ -21,11 +21,16 @@ minetest.register_entity("shooter_grenade:grenade_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local above = {x=pos.x, y=pos.y + 1, z=pos.z}
 			if minetest.get_node(pos).name ~= "air" then
+				if self.user then
+					local player = minetest.get_player_by_name(self.user)
+					if player then
+						shooter:blast(above, 2, 25, 5, player)
+					end
+				end
 				self.object:remove()
-				shooter:blast(above, 2, 25, 5, self.player)
 			end
 			self.timer = 0
 		end
@@ -40,28 +45,29 @@ minetest.register_tool("shooter_grenade:grenade", {
 	inventory_image = "shooter_hand_grenade.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if not minetest.setting_getbool("creative_mode") then
-			itemstack = ""
+			itemstack:clear()
 		end
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
-			if vector.distance(user:getpos(), pointed) < 8 then
+			if vector.distance(user:get_pos(), pointed) < 8 then
 				shooter:blast(pointed, 1, 25, 5)
 				return
 			end
 		end
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local dir = user:get_look_dir()
-		local yaw = user:get_look_yaw()
+		local yaw = user:get_look_horizontal()
 		if pos and dir then
-			pos.y = pos.y + 1.5
+			pos.y = pos.y + shooter.config.camera_height
 			local obj = minetest.add_entity(pos, "shooter_grenade:grenade_entity")
 			if obj then
-				obj:setvelocity({x=dir.x * 15, y=dir.y * 15, z=dir.z * 15})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-				obj:setyaw(yaw + math.pi)
+				minetest.sound_play("shooter_throw", {object=obj})
+				obj:set_velocity(vector.multiply(dir, 15))
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(yaw + math.pi / 2)
 				local ent = obj:get_luaentity()
 				if ent then
-					ent.player = ent.player or user
+					ent.user = user:get_player_name()
 				end
 			end
 		end

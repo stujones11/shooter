@@ -1,6 +1,7 @@
 local config = {
 	crossbow_uses = 50,
 	arrow_lifetime = 180,
+	arrow_object_attach = false,
 }
 
 -- Legacy Config Support
@@ -21,11 +22,13 @@ if minetest.global_exists("SHOOTER_ARROW_TOOL_CAPS") then
 	arrow_tool_caps = table.copy(SHOOTER_ARROW_TOOL_CAPS)
 end
 
-minetest.register_alias("shooter_crossbow:arrow", "shooter_crossbow:arrow_white")
-minetest.register_alias("shooter:crossbow_loaded", "shooter:crossbow_loaded_white")
-
 local dye_basecolors = (dye and dye.basecolors) or
 	{"white", "grey", "black", "red", "yellow", "green", "cyan", "blue", "magenta"}
+
+-- name is the overlay texture name, colour is used to select the wool texture
+local function get_texture(name, colour)
+	return "wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
+end
 
 local function get_animation_frame(dir)
 	local angle = math.atan(dir.y)
@@ -38,15 +41,55 @@ local function get_animation_frame(dir)
 	return frame
 end
 
-local function get_target_pos(p1, p2, dir, offset)
-	local d = vector.distance(p1, p2) - offset
-	local td = vector.multiply(dir, {x=d, y=d, z=d})
-	return vector.add(p1, td)
+local function get_pointed_thing(pos, dir, dist)
+	local p1 = vector.add(pos, dir)
+	local p2 = vector.add(pos, vector.multiply(dir, dist))
+	local ray = minetest.raycast(p1, p2, true, true)
+	return ray:next()
 end
 
--- name is the overlay texture name, colour is used to select the wool texture
-local function get_texture(name, colour)
-	return "wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
+local function strike(arrow, pointed_thing, name)
+	local puncher = minetest.get_player_by_name(name)
+	if not puncher then
+		return
+	end
+	local object = arrow.object
+	local hit_pos = pointed_thing.intersection_point or object:get_pos()
+	local dir = vector.normalize(object:get_velocity())
+	if pointed_thing.type == "object" then
+		local target = pointed_thing.ref
+		if shooter:is_valid_object(target) then
+			local puncher = minetest.get_player_by_name(name)
+			if puncher and puncher ~= target then
+				local groups = target:get_armor_groups() or {}
+				if groups.fleshy then
+					shooter:spawn_particles(hit_pos,
+						shooter.config.explosion_texture)
+				end
+				target:punch(object, nil, arrow_tool_caps, dir)
+				if config.arrow_object_attach then
+					local pos = vector.multiply(vector.subtract(target:get_pos(),
+						hit_pos), -10)
+					local rot = vector.new()
+					rot.y = (target:get_yaw() - object:get_yaw()) * 57.2958
+					object:set_attach(target, "", pos, rot)
+					arrow.state = "stuck"
+				else
+					arrow.state = "dropped"
+				end
+			end
+		end
+	elseif pointed_thing.type == "node" then
+		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
+		local node = minetest.get_node(pos)
+		hit_pos = vector.subtract(hit_pos, vector.multiply(dir, 0.25))
+		arrow.node_pos = pos
+		arrow.state = "stuck"
+		shooter:play_node_sound(node, pos)
+	else
+		return
+	end
+	arrow:stop(hit_pos)
 end
 
 minetest.register_entity("shooter_crossbow:arrow_entity", {
@@ -60,14 +103,14 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 	color = "white",
 	timer = 0,
 	lifetime = config.arrow_lifetime,
-	player = nil,
+	user = nil,
 	state = "init",
 	node_pos = nil,
 	collisionbox = {0,0,0, 0,0,0},
 	stop = function(self, pos)
 		local acceleration = {x=0, y=-10, z=0}
 		if self.state == "stuck" then
-			pos = pos or self.object:getpos()
+			pos = pos or self.object:get_pos()
 			acceleration = {x=0, y=0, z=0}
 		end
 		if pos then
@@ -77,22 +120,8 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 			physical = true,
 			collisionbox = {-1/8,-1/8,-1/8, 1/8,1/8,1/8},
 		})
-		self.object:setvelocity({x=0, y=0, z=0})
-		self.object:setacceleration(acceleration)
-	end,
-	strike = function(self, object)
-		local puncher = self.player
-		if puncher and shooter:is_valid_object(object) then
-			if puncher ~= object then
-				local dir = puncher:get_look_dir()
-				local p1 = puncher:getpos()
-				local p2 = object:getpos()
-				local tpos = get_target_pos(p1, p2, dir, 0)
-				shooter:spawn_particles(tpos, shooter.config.explosion_texture)
-				object:punch(puncher, nil, arrow_tool_caps, dir)
-			end
-		end
-		self:stop(object:getpos())
+		self.object:set_velocity({x=0, y=0, z=0})
+		self.object:set_acceleration(acceleration)
 	end,
 	on_activate = function(self, staticdata)
 		self.object:set_armor_groups({immortal=1})
@@ -143,25 +172,12 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 			return
 		end
 		if self.timer > 0.2 then
-			local dir = vector.normalize(self.object:getvelocity())
+			local dir = vector.normalize(self.object:get_velocity())
 			local frame = get_animation_frame(dir)
-			local p1 = vector.add(self.object:getpos(), dir)
-			local p2 = vector.add(p1, vector.multiply(dir, 4))
-			local ray = minetest.raycast(p1, p2, true, true)
-			local pointed_thing = ray:next() or {}
-			if pointed_thing.type == "object" then
-				local obj = pointed_thing.ref
-				if shooter:is_valid_object(obj) then
-					self:strike(obj)
-				end
-			elseif pointed_thing.type == "node" then
-				local pos = minetest.get_pointed_thing_position(pointed_thing, false)
-				local node = minetest.get_node(pos)
-				local target_pos = get_target_pos(p1, pos, dir, 0.66)
-				self.node_pos = pos
-				self.state = "stuck"
-				self:stop(target_pos)
-				shooter:play_node_sound(node, pos)
+			local pos = self.object:get_pos()
+			local pointed_thing = get_pointed_thing(pos, dir, 5)
+			if pointed_thing then
+				strike(self, pointed_thing, self.user)
 			end
 			self.object:set_animation({x=frame, y=frame}, 0)
 			self.timer = 0
@@ -184,55 +200,37 @@ for _, color in pairs(dye_basecolors) do
 		on_use = function(itemstack, user, pointed_thing)
 			minetest.sound_play("shooter_click", {object=user})
 			if not minetest.setting_getbool("creative_mode") then
-				itemstack:add_wear(65535/config.crossbow_uses)
+				itemstack:add_wear(65535 / config.crossbow_uses)
 			end
 			itemstack = "shooter_crossbow:crossbow 1 "..itemstack:get_wear()
-			local pos = user:getpos()
+			local pos = user:get_pos()
 			local dir = user:get_look_dir()
-			local yaw = user:get_look_yaw()
+			local yaw = user:get_look_horizontal()
 			if pos and dir and yaw then
 				pos.y = pos.y + shooter.config.camera_height
-				pos = vector.add(pos, dir)
-				local obj = minetest.add_entity(pos, "shooter_crossbow:arrow_entity")
+				local obj = minetest.add_entity(pos,
+					"shooter_crossbow:arrow_entity")
 				local ent = nil
 				if obj then
 					ent = obj:get_luaentity()
 				end
 				if ent then
-					ent.player = ent.player or user
+					ent.user = user:get_player_name()
 					ent.state = "flight"
 					ent.color = color
 					obj:set_properties({
 						textures = {get_texture("arrow_uv", color)}
 					})
-					minetest.sound_play("shooter_throw", {object=obj}) 
+					minetest.sound_play("shooter_throw", {object=obj})
 					local frame = get_animation_frame(dir)
-					obj:setyaw(yaw + math.pi)
+					obj:set_yaw(yaw - math.pi / 2)
 					obj:set_animation({x=frame, y=frame}, 0)
-					obj:setvelocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
-					if pointed_thing.type ~= "nothing" then
-						local ppos = minetest.get_pointed_thing_position(pointed_thing, false)
-						local _, npos = minetest.line_of_sight(pos, ppos, 1)
-						if npos then
-							ppos = npos
-							pointed_thing.type = "node"
-						end
-						if pointed_thing.type == "object" then
-							ent:strike(pointed_thing.ref)
-							return itemstack
-						elseif pointed_thing.type == "node" then
-							local node = minetest.get_node(ppos)
-							local tpos = get_target_pos(pos, ppos, dir, 0.66)
-							minetest.after(0.2, function(object, pos, npos)
-								ent.node_pos = npos
-								ent.state = "stuck"
-								ent:stop(pos)
-								shooter:play_node_sound(node, npos)
-							end, obj, tpos, ppos)
-							return itemstack
-						end
+					obj:set_velocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
+					obj:set_acceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
+					pointed_thing = get_pointed_thing(pos, dir, 5)
+					if pointed_thing then
+						strike(ent, pointed_thing, ent.user)
 					end
-					obj:setacceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
 				end
 			end
 			return itemstack

@@ -80,12 +80,22 @@ function shooter:spawn_particles(pos, texture)
 			texture = config.explosion_texture
 		end
 		local spread = {x=0.1, y=0.1, z=0.1}
-		minetest.add_particlespawner(15, 0.3,
-			vector.subtract(pos, spread), vector.add(pos, spread),
-			{x=-1, y=1, z=-1}, {x=1, y=2, z=1},
-			{x=-2, y=-2, z=-2}, {x=2, y=-2, z=2},
-			0.1, 0.75, 1, 2, false, texture
-		)
+		minetest.add_particlespawner({
+			amount = 15,
+			time = 0.3,
+			minpos = vector.subtract(pos, spread),
+			maxpos = vector.add(pos, spread),
+			minvel = {x=-1, y=1, z=-1},
+			maxvel = {x=1, y=2, z=1},
+			minacc = {x=-2, y=-2, z=-2},
+			maxacc = {x=2, y=-2, z=2},
+			minexptime = 0.1,
+			maxexptime = 0.75,
+			minsize = 1,
+			maxsize = 2,
+			collisiondetection = false,
+			texture = texture,
+		})
 	end
 end
 
@@ -261,21 +271,32 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 		end
 	end
 	if config.enable_particle_fx == true then
-		minetest.add_particlespawner(50, 0.1,
-			p1, p2, {x=-0, y=-0, z=-0}, {x=0, y=0, z=0},
-			{x=-0.5, y=5, z=-0.5}, {x=0.5, y=5, z=0.5},
-			0.1, 1, 8, 15, false, "tnt_smoke.png"
-		)
+		minetest.add_particlespawner({
+			amount = 50,
+			time = 0.1,
+			minpos = p1,
+			maxpos = p2,
+			minvel = {x=0, y=0, z=0},
+			maxvel = {x=0, y=0, z=0},
+			minacc = {x=-0.5, y=5, z=-0.5},
+			maxacc = {x=0.5, y=5, z=0.5},
+			minexptime = 0.1,
+			maxexptime = 1,
+			minsize = 8,
+			maxsize = 15,
+			collisiondetection = false,
+			texture = "tnt_smoke.png",
+		})
 	end
 	local objects = minetest.get_objects_inside_radius(pos, distance)
 	for _,obj in ipairs(objects) do
 		if shooter:is_valid_object(obj) then
-			local obj_pos = obj:getpos()
+			local obj_pos = obj:get_pos()
 			local dist = vector.distance(obj_pos, pos)
 			local damage = (fleshy * 0.5 ^ dist) * 2
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1
-				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
+				local blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
 				if minetest.line_of_sight(obj_pos, blast_pos, 1) then
 					obj:punch(user, 1.0, {
 						full_punch_interval = 1.0,
