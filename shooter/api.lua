@@ -275,7 +275,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			local damage = (fleshy * 0.5 ^ dist) * 2
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1
-				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
+				local blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
 				if minetest.line_of_sight(obj_pos, blast_pos, 1) then
 					obj:punch(user, 1.0, {
 						full_punch_interval = 1.0,
