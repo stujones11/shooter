@@ -1,4 +1,4 @@
-shooter:register_weapon("shooter_guns:pistol", {
+shooter.register_weapon("shooter_guns:pistol", {
 	description = "Pistol",
 	inventory_image = "shooter_pistol.png",
 	spec = {
@@ -12,7 +12,7 @@ shooter:register_weapon("shooter_guns:pistol", {
 	},
 })
 
-shooter:register_weapon("shooter_guns:rifle", {
+shooter.register_weapon("shooter_guns:rifle", {
 	description = "Rifle",
 	inventory_image = "shooter_rifle.png",
 	spec = {
@@ -26,7 +26,7 @@ shooter:register_weapon("shooter_guns:rifle", {
 	},
 })
 
-shooter:register_weapon("shooter_guns:shotgun", {
+shooter.register_weapon("shooter_guns:shotgun", {
 	description = "Shotgun",
 	inventory_image = "shooter_shotgun.png",
 	spec = {
@@ -40,7 +40,7 @@ shooter:register_weapon("shooter_guns:shotgun", {
 	},
 })
 
-shooter:register_weapon("shooter_guns:machine_gun", {
+shooter.register_weapon("shooter_guns:machine_gun", {
 	description = "Sub Machine Gun",
 	inventory_image = "shooter_smgun.png",
 	spec = {

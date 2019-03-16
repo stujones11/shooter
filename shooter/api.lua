@@ -22,7 +22,7 @@ local shooting = {}
 local config = shooter.config
 local server_step = minetest.settings:get("dedicated_server_step")
 
-function shooter:register_weapon(name, def)
+shooter.register_weapon = function(name, def)
 	shooter.registered_weapons[name] = def
 	-- Fix definition table
 	def.sounds = def.sounds or {}
@@ -42,7 +42,7 @@ function shooter:register_weapon(name, def)
 		description = def.description,
 		inventory_image = def.inventory_image,
 		on_use = function(itemstack, user)
-			if shooter:fire_weapon(user, itemstack, def.spec) then
+			if shooter.fire_weapon(user, itemstack, def.spec) then
 				itemstack:add_wear(def.spec.wear)
 				if itemstack:get_count() == 0 then
 					itemstack = def.unloaded_item.name
@@ -74,7 +74,7 @@ function shooter:register_weapon(name, def)
 	})
 end
 
-function shooter:spawn_particles(pos, texture)
+shooter.spawn_particles = function(pos, texture)
 	if config.enable_particle_fx == true then
 		if type(texture) ~= "string" then
 			texture = config.explosion_texture
@@ -99,7 +99,7 @@ function shooter:spawn_particles(pos, texture)
 	end
 end
 
-function shooter:play_node_sound(node, pos)
+shooter.play_node_sound = function(node, pos)
 	local item = minetest.registered_items[node.name]
 	if item then
 		if item.sounds then
@@ -112,7 +112,7 @@ function shooter:play_node_sound(node, pos)
 	end
 end
 
-function shooter:punch_node(pos, spec)
+shooter.punch_node = function(pos, spec)
 	local node = minetest.get_node(pos)
 	if not node then
 		return
@@ -131,10 +131,10 @@ function shooter:punch_node(pos, spec)
 			local level = item.groups[k] or 0
 			if level >= v then
 				minetest.remove_node(pos)
-				shooter:play_node_sound(node, pos)
+				shooter.play_node_sound(node, pos)
 				if item.tiles then
 					if item.tiles[1] then
-						shooter:spawn_particles(pos, item.tiles[1])
+						shooter.spawn_particles(pos, item.tiles[1])
 					end
 				end
 				break
@@ -143,7 +143,7 @@ function shooter:punch_node(pos, spec)
 	end
 end
 
-function shooter:is_valid_object(object)
+shooter.is_valid_object = function(object)
 	if object then
 		if object:is_player() == true then
 			return config.allow_players
@@ -169,17 +169,17 @@ local function process_round(round)
 	if pointed_thing.type == "node" then
 		if config.allow_nodes == true then
 			local pos = minetest.get_pointed_thing_position(pointed_thing, false)
-			shooter:punch_node(pos, round.spec)
+			shooter.punch_node(pos, round.spec)
 		end
 		return
 	elseif pointed_thing.type == "object" then
 		local object = pointed_thing.ref
-		if shooter:is_valid_object(object) == true then
+		if shooter.is_valid_object(object) == true then
 			local player = minetest.get_player_by_name(round.spec.user)
 			if player then
 				object:punch(player, nil, round.spec.tool_caps, round.dir)
 				local pos = pointed_thing.intersection_point or object:get_pos()
-				shooter:spawn_particles(pos, config.explosion_texture)
+				shooter.spawn_particles(pos, config.explosion_texture)
 			end
 		end
 		return
@@ -236,7 +236,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 	end, player, itemstack, spec)
 end
 
-function shooter:fire_weapon(player, itemstack, spec)
+shooter.fire_weapon = function(player, itemstack, spec)
 	local name = player:get_player_name()
 	local time = minetest.get_us_time() / 1000000
 	if shots[name] and time <= shots[name] then
@@ -252,7 +252,7 @@ function shooter:fire_weapon(player, itemstack, spec)
 	return true
 end
 
-function shooter:blast(pos, radius, fleshy, distance, user)
+shooter.blast = function(pos, radius, fleshy, distance, user)
 	if not user then
 		return
 	end
@@ -290,7 +290,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	end
 	local objects = minetest.get_objects_inside_radius(pos, distance)
 	for _,obj in ipairs(objects) do
-		if shooter:is_valid_object(obj) then
+		if shooter.is_valid_object(obj) then
 			local obj_pos = obj:get_pos()
 			local dist = vector.distance(obj_pos, pos)
 			local damage = (fleshy * 0.5 ^ dist) * 2

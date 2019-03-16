@@ -58,12 +58,12 @@ local function strike(arrow, pointed_thing, name)
 	local dir = vector.normalize(object:get_velocity())
 	if pointed_thing.type == "object" then
 		local target = pointed_thing.ref
-		if shooter:is_valid_object(target) then
+		if shooter.is_valid_object(target) then
 			local puncher = minetest.get_player_by_name(name)
 			if puncher and puncher ~= target then
 				local groups = target:get_armor_groups() or {}
 				if groups.fleshy then
-					shooter:spawn_particles(hit_pos,
+					shooter.spawn_particles(hit_pos,
 						shooter.config.explosion_texture)
 				end
 				target:punch(object, nil, arrow_tool_caps, dir)
@@ -85,7 +85,7 @@ local function strike(arrow, pointed_thing, name)
 		hit_pos = vector.subtract(hit_pos, vector.multiply(dir, 0.25))
 		arrow.node_pos = pos
 		arrow.state = "stuck"
-		shooter:play_node_sound(node, pos)
+		shooter.play_node_sound(node, pos)
 	else
 		return
 	end

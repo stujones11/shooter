@@ -32,7 +32,7 @@ The API works with tools and items that represent a weapon,
 then you should register the weapon and another support items (like ammo).
 
 ### Methods
-* `shooter:register_weapon(weapon_name, {Weapon Definitions})`: Register a weapon item
+* `shooter.register_weapon(weapon_name, {Weapon Definitions})`: Register a weapon item
   `weapon_name` is the itemstring for a tool to be registered
 
 Global Tables
@@ -42,7 +42,7 @@ Global Tables
 Definition tables
 -----------------
 
-### Weapon Definitions (`shooter:register_weapon`)
+### Weapon Definitions (`shooter.register_weapon`)
 
     {
         description = "Rifle", -- Weapon description name

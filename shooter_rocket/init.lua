@@ -33,7 +33,7 @@ minetest.register_entity("shooter_rocket:rocket_entity", {
 				if self.user then
 					local player = minetest.get_player_by_name(self.user)
 					if player then
-						shooter:blast(above, 4, 50, 8, player)
+						shooter.blast(above, 4, 50, 8, player)
 					end
 				end
 				self.object:remove()
@@ -58,7 +58,7 @@ minetest.register_tool("shooter_rocket:rocket_gun_loaded", {
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
 			if vector.distance(user:get_pos(), pointed) < 8 then
-				shooter:blast(pointed, 2, 50, 7)
+				shooter.blast(pointed, 2, 50, 7)
 				return itemstack
 			end
 		end
