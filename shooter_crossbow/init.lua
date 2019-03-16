@@ -221,7 +221,7 @@ for _, color in pairs(dye_basecolors) do
 					obj:set_properties({
 						textures = {get_texture("arrow_uv", color)}
 					})
-					minetest.sound_play("shooter_throw", {object=obj}) 
+					minetest.sound_play("shooter_throw", {object=obj})
 					local frame = get_animation_frame(dir)
 					obj:set_yaw(yaw - math.pi / 2)
 					obj:set_animation({x=frame, y=frame}, 0)

@@ -139,15 +139,15 @@ minetest.register_entity("shooter_turret:turret_entity", {
 			z = len * math.cos(self.yaw),
 		})
 		local pos = {x=self.pos.x, y=self.pos.y + 0.87, z=self.pos.z}
-		pos = vector.add(pos, {x=dir.x * 1.5, y=dir.y * 1.5, z=dir.z * 1.5})
+		pos = vector.add(pos, vector.multiply(dir, 1.5))
 		local obj = minetest.add_entity(pos, "shooter_rocket:rocket_entity")
 		if obj then
 			local ent = obj:get_luaentity()
 			if ent then
 				minetest.sound_play("shooter_rocket_fire", {object=obj})
-				ent.player = minetest.get_player_by_name(self.user)
+				ent.user = self.user
 				obj:set_yaw(self.yaw)
-				obj:set_velocity({x=dir.x * 30, y=dir.y * 30, z=dir.z * 30})
+				obj:set_velocity(vector.multiply(dir, 30))
 				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 			end
 		end
