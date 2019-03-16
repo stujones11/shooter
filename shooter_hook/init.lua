@@ -1,22 +1,22 @@
 local function throw_hook(itemstack, user, vel)
 	local inv = user:get_inventory()
-	local pos = user:getpos()
+	local pos = user:get_pos()
 	local dir = user:get_look_dir()
-	local yaw = user:get_look_yaw()
+	local yaw = user:get_look_horizontal()
 	if pos and dir and yaw then
 		if not minetest.setting_getbool("creative_mode") then
-			itemstack:add_wear(65535/100)
+			itemstack:add_wear(65535 / 100)
 		end
 		pos.y = pos.y + 1.5
 		local obj = minetest.add_entity(pos, "shooter_hook:hook")
 		if obj then
 			minetest.sound_play("shooter_throw", {object=obj})
-			obj:setvelocity({x=dir.x * vel, y=dir.y * vel, z=dir.z * vel})
-			obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-			obj:setyaw(yaw + math.pi)
+			obj:set_velocity(vector.multiply(dir, vel))
+			obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+			obj:set_yaw(yaw + math.pi / 2)
 			local ent = obj:get_luaentity()
 			if ent then
-				ent.player = ent.player or user
+				ent.user = user:get_player_name()
 				ent.itemstack = itemstack
 			end
 		end
@@ -29,7 +29,7 @@ minetest.register_entity("shooter_hook:hook", {
 	visual = "wielditem",
 	visual_size = {x=1/2, y=1/2},
 	textures = {"shooter_hook:grapple_hook"},
-	player = nil,
+	user = nil,
 	itemstack = "",
 	collisionbox = {-1/4,-1/4,-1/4, 1/4,1/4,1/4},
 	on_activate = function(self, staticdata)
@@ -39,20 +39,23 @@ minetest.register_entity("shooter_hook:hook", {
 		end
 	end,
 	on_step = function(self, dtime)
-		if not self.player then
+		if not self.user then
 			return
 		end
 		self.timer = self.timer + dtime
 		if self.timer > 0.25 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local below = {x=pos.x, y=pos.y - 1, z=pos.z}
 			local node = minetest.get_node(below)
 			if node.name ~= "air" then
-				self.object:setvelocity({x=0, y=-10, z=0})
-				self.object:setacceleration({x=0, y=0, z=0})
+				self.object:set_velocity({x=0, y=-10, z=0})
+				self.object:set_acceleration({x=0, y=0, z=0})
 				if minetest.get_item_group(node.name, "liquid") == 0 and
 						minetest.get_node(pos).name == "air" then
-					self.player:moveto(pos)
+					local player = minetest.get_player_by_name(self.user)
+					if player then
+						player:moveto(pos)
+					end
 				end
 				if minetest.get_item_group(node.name, "lava") == 0 then
 					minetest.add_item(pos, self.itemstack)

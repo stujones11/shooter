@@ -12,7 +12,7 @@ minetest.register_node("shooter_flaregun:flare_light", {
 	walkable = false,
 	buildable_to = true,
 	sunlight_propagates = true,
-	light_source = LIGHT_MAX,
+	light_source = 14,
 	pointable = false,
 })
 
@@ -47,7 +47,7 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 		"shooter_flare.png",
 		"shooter_flare.png",
 	},
-	player = nil,
+	glow = 14,
 	collisionbox = {-1/16,-1/16,-1/16, 1/16,1/16,1/16},
 	on_activate = function(self, staticdata)
 		if staticdata == "expired" then
@@ -57,29 +57,41 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local below = {x=pos.x, y=pos.y - 1, z=pos.z}
 			local node = minetest.get_node(below)
 			if node.name ~= "air" then
-				self.object:setvelocity({x=0, y=-10, z=0})
-				self.object:setacceleration({x=0, y=0, z=0})
+				self.object:set_velocity({x=0, y=-10, z=0})
+				self.object:set_acceleration({x=0, y=0, z=0})
 				if minetest.get_node(pos).name == "air" and
 						node.name ~= "default:water_source" and
 						node.name ~= "default:water_flowing" then
 					minetest.place_node(pos, {name="shooter_flaregun:flare_light"})
 					local meta = minetest.get_meta(pos)
 					pos.y = pos.y - 0.1
-					local id = minetest.add_particlespawner(
-						1000, 30, pos, pos,
-						{x=-1, y=1, z=-1}, {x=1, y=1, z=1},
-						{x=2, y=-2, z=-2}, {x=2, y=-2, z=2},
-						0.1, 0.75, 1, 8, false, "shooter_flare_particle.png"
-					)
+					local id = minetest.add_particlespawner({
+						amount = 1000,
+						time = 30,
+						minpos = pos,
+						maxpos = pos,
+						minvel = {x=-1, y=1, z=-1},
+						maxvel = {x=1, y=1, z=1},
+						minacc = {x=2, y=-2, z=-2},
+						maxacc = {x=2, y=-2, z=2},
+						minexptime = 0.1,
+						maxexptime = 0.75,
+						minsize = 1,
+						maxsize = 8,
+						collisiondetection = false,
+						texture = "shooter_flare_particle.png",
+						glow = 14,
+					})
 					meta:set_int("particle_id", id)
 					meta:set_int("init_time", os.time())
 					local sound = minetest.sound_play("shooter_flare_burn", {
-						object = self.player,
+						pos = pos,
 						loop = true,
+						max_hear_distance = 8,
 					})
 					minetest.after(30, function(sound)
 						minetest.sound_stop(sound)
@@ -106,23 +118,19 @@ minetest.register_tool("shooter_flaregun:flaregun", {
 		end
 		if not minetest.setting_getbool("creative_mode") then
 			inv:remove_item("main", "shooter:flare 1")
-			itemstack:add_wear(65535/100)
+			itemstack:add_wear(65535 / 100)
 		end
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local dir = user:get_look_dir()
-		local yaw = user:get_look_yaw()
+		local yaw = user:get_look_horizontal()
 		if pos and dir and yaw then
 			pos.y = pos.y + 1.5
 			local obj = minetest.add_entity(pos, "shooter_flaregun:flare_entity")
 			if obj then
 				minetest.sound_play("shooter_flare_fire", {object=obj})
-				obj:setvelocity({x=dir.x * 16, y=dir.y * 16, z=dir.z * 16})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-				obj:setyaw(yaw + math.pi)
-				local ent = obj:get_luaentity()
-				if ent then
-					ent.player = ent.player or user
-				end
+				obj:set_velocity(vector.multiply(dir, 16))
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(yaw + math.pi / 2)
 			end
 		end
 		return itemstack
