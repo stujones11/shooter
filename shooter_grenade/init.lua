@@ -27,7 +27,7 @@ minetest.register_entity("shooter_grenade:grenade_entity", {
 				if self.user then
 					local player = minetest.get_player_by_name(self.user)
 					if player then
-						shooter:blast(above, 2, 25, 5, player)
+						shooter.blast(above, 2, 25, 5, player)
 					end
 				end
 				self.object:remove()
@@ -50,7 +50,7 @@ minetest.register_tool("shooter_grenade:grenade", {
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
 			if vector.distance(user:get_pos(), pointed) < 8 then
-				shooter:blast(pointed, 1, 25, 5)
+				shooter.blast(pointed, 1, 25, 5)
 				return
 			end
 		end
