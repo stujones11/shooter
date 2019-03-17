@@ -1,2 +1,2 @@
-First person shooter mod.
-Adds firearms plus a few other fun items.
+Shooter Mod API.
+Handles raycasting, blasting and audio-visual effects of dependent mods.

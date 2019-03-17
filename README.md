@@ -1,4 +1,4 @@
-[modpack] - Simple Shooter [shooter]
+[modpack] Simple Shooter [shooter]
 ====================================
 
 Mod Version: 0.6.0
@@ -49,6 +49,14 @@ Adds simple hand grenades.
 Depends: shooter, tnt
 
 Adds rocket missiles and launching gun.
+
+[mod] Grapple Hook [shooter_hook]
+---------------------------------
+
+Depends: shooter, tnt
+
+Adds a teleporting grapple hook which can be thrown or launched
+further from a grapple hook gun.
 
 [mod] Turret Gun [shooter_turret]
 ---------------------------------

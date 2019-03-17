@@ -1,0 +1,2 @@
+Adds a mountable turret gun which can also be triggered by mesecon signals.
+Still WIP and experimental and may be subject to change or removal.
