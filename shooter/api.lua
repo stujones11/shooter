@@ -3,7 +3,8 @@ shooter = {
 }
 
 shooter.config = {
-	admin_weapons = true,
+	automatic_weapons = true,
+	admin_weapons = false,
 	enable_blasting = false,
 	enable_particle_fx = true,
 	enable_protection = false,
@@ -260,11 +261,13 @@ shooter.fire_weapon = function(player, itemstack, spec)
 	if shots[name] and time <= shots[name] then
 		return false
 	end
-	if config.admin_weapons and	minetest.check_player_privs(name,
-			{server=true}) then
-		spec.automatic = true
+	if config.automatic_weapons then
+		if config.admin_weapons and minetest.check_player_privs(name,
+				{server=true}) then
+			spec.automatic = true
+		end
+		shooting[name] = true
 	end
-	shooting[name] = true
 	spec.user = name
 	fire_weapon(player, itemstack, spec)
 	return true
@@ -357,11 +360,6 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 	end
 end
 
-minetest.register_globalstep(function(dtime)
-	for _,player in pairs(minetest.get_connected_players()) do
-		local name = player:get_player_name()
-		if name then
-			shooting[name] = player:get_player_control().LMB == true
-		end
-	end
-end)
+shooter.set_shooting = function(name, is_shooting)
+	shooting[name] = is_shooting and true or nil
+end
