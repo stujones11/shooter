@@ -63,8 +63,7 @@ local function strike(arrow, pointed_thing, name)
 			if puncher and puncher ~= target then
 				local groups = target:get_armor_groups() or {}
 				if groups.fleshy then
-					shooter.spawn_particles(hit_pos,
-						shooter.config.explosion_texture)
+					shooter.spawn_particles(hit_pos)
 				end
 				target:punch(object, nil, arrow_tool_caps, dir)
 				if config.arrow_object_attach then

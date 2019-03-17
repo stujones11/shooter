@@ -16,6 +16,23 @@ shooter.config = {
 	camera_height = 1.5,
 }
 
+shooter.default_particles = {
+	amount = 15,
+	time = 0.3,
+	minpos = {x=-0.1, y=-0.1, z=-0.1},
+	maxpos = {x=0.1, y=0.1, z=0.1},
+	minvel = {x=-1, y=1, z=-1},
+	maxvel = {x=1, y=2, z=1},
+	minacc = {x=-2, y=-2, z=-2},
+	maxacc = {x=2, y=-2, z=2},
+	minexptime = 0.1,
+	maxexptime = 0.75,
+	minsize = 1,
+	maxsize = 2,
+	collisiondetection = false,
+	texture = "shooter_hit.png",
+}
+
 local rounds = {}
 local shots = {}
 local shooting = {}
@@ -74,29 +91,21 @@ shooter.register_weapon = function(name, def)
 	})
 end
 
-shooter.spawn_particles = function(pos, texture)
-	if config.enable_particle_fx == true then
-		if type(texture) ~= "string" then
-			texture = config.explosion_texture
-		end
-		local spread = {x=0.1, y=0.1, z=0.1}
-		minetest.add_particlespawner({
-			amount = 15,
-			time = 0.3,
-			minpos = vector.subtract(pos, spread),
-			maxpos = vector.add(pos, spread),
-			minvel = {x=-1, y=1, z=-1},
-			maxvel = {x=1, y=2, z=1},
-			minacc = {x=-2, y=-2, z=-2},
-			maxacc = {x=2, y=-2, z=2},
-			minexptime = 0.1,
-			maxexptime = 0.75,
-			minsize = 1,
-			maxsize = 2,
-			collisiondetection = false,
-			texture = texture,
-		})
+shooter.spawn_particles = function(pos, particles)
+	particles = particles or {}
+	if not config.enable_particle_fx == true or particles.amount == 0 then
+		return
 	end
+	local copy = function(v)
+		return type(v) == "table" and table.copy(v) or v
+	end
+	local p = {}
+	for k, v in pairs(shooter.default_particles) do
+		p[k] = particles[k] and copy(particles[k]) or copy(v)
+	end
+	p.minpos = vector.subtract(pos, p.minpos)
+	p.maxpos = vector.add(pos, p.maxpos)
+	minetest.add_particlespawner(p)
 end
 
 shooter.play_node_sound = function(node, pos)
@@ -134,7 +143,7 @@ shooter.punch_node = function(pos, spec)
 				shooter.play_node_sound(node, pos)
 				if item.tiles then
 					if item.tiles[1] then
-						shooter.spawn_particles(pos, item.tiles[1])
+						shooter.spawn_particles(pos, {texture=item.tiles[1]})
 					end
 				end
 				break
@@ -170,7 +179,7 @@ local function process_hit(pointed_thing, spec, dir)
 			if player then
 				object:punch(player, nil, spec.tool_caps, dir)
 				local pos = pointed_thing.intersection_point or object:get_pos()
-				shooter.spawn_particles(pos, config.explosion_texture)
+				shooter.spawn_particles(pos, spec.particles)
 			end
 		end
 	end
@@ -208,14 +217,16 @@ local function fire_weapon(player, itemstack, spec, extended)
 	end
 	pos.y = pos.y + config.camera_height
 	minetest.sound_play(spec.sound, {object=player})
-	minetest.add_particle({
-		pos = pos,
-		velocity = vector.multiply(dir, 30),
-		acceleration = {x=0, y=0, z=0},
-		expirationtime = 0.5,
-		size = 0.25,
-		texture = spec.particle,
-	})
+	if spec.bullet_image then
+		minetest.add_particle({
+			pos = pos,
+			velocity = vector.multiply(dir, 30),
+			acceleration = {x=0, y=0, z=0},
+			expirationtime = 0.5,
+			size = 0.25,
+			texture = spec.bullet_image,
+		})
+	end
 	process_round({
 		spec = spec,
 		pos = vector.add(pos, dir),

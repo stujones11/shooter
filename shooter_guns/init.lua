@@ -8,7 +8,12 @@ shooter.register_weapon("shooter_guns:pistol", {
 		tool_caps = {full_punch_interval=0.5, damage_groups={fleshy=2}},
 		groups = {snappy=3, fleshy=3, oddly_breakable_by_hand=3},
 		sound = "shooter_pistol",
-		particle = "shooter_cap.png",
+		bullet_image = "shooter_cap.png",
+		particles = {
+			amount = 8,
+			minsize = 0.25,
+			maxsize = 0.75,
+		},
 	},
 })
 
@@ -22,7 +27,12 @@ shooter.register_weapon("shooter_guns:rifle", {
 		tool_caps = {full_punch_interval=1.0, damage_groups={fleshy=3}},
 		groups = {snappy=3, crumbly=3, choppy=3, fleshy=2, oddly_breakable_by_hand=2},
 		sound = "shooter_rifle",
-		particle = "shooter_bullet.png",
+		bullet_image = "shooter_bullet.png",
+		particles = {
+			amount = 12,
+			minsize = 0.75,
+			maxsize = 1.5,
+		},
 	},
 })
 
@@ -36,7 +46,12 @@ shooter.register_weapon("shooter_guns:shotgun", {
 		tool_caps = {full_punch_interval=1.5, damage_groups={fleshy=4}},
 		groups = {cracky=3, snappy=2, crumbly=2, choppy=2, fleshy=1, oddly_breakable_by_hand=1},
 		sound = "shooter_shotgun",
-		particle = "smoke_puff.png",
+		bullet_image = "smoke_puff.png",
+		particles = {
+			amount = 16,
+			minsize = 1,
+			maxsize = 2,
+		},
 	},
 })
 
@@ -51,7 +66,12 @@ shooter.register_weapon("shooter_guns:machine_gun", {
 		tool_caps = {full_punch_interval=0.1, damage_groups={fleshy=2}},
 		groups = {snappy=3, fleshy=3, oddly_breakable_by_hand=3},
 		sound = "shooter_pistol",
-		particle = "shooter_cap.png",
+		bullet_image = "shooter_cap.png",
+		particles = {
+			amount = 4,
+			minsize = 0.25,
+			maxsize = 0.75,
+		},
 	},
 })
 
