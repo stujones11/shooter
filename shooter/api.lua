@@ -157,6 +157,28 @@ shooter.is_valid_object = function(object)
 	end
 end
 
+local function process_hit(pointed_thing, spec, dir)
+	if pointed_thing.type == "node" then
+		if config.allow_nodes == true then
+			local pos = minetest.get_pointed_thing_position(pointed_thing, false)
+			shooter.punch_node(pos, spec)
+		end
+	elseif pointed_thing.type == "object" then
+		local object = pointed_thing.ref
+		if shooter.is_valid_object(object) == true then
+			local player = minetest.get_player_by_name(spec.user)
+			if player then
+				object:punch(player, nil, spec.tool_caps, dir)
+				local pos = pointed_thing.intersection_point or object:get_pos()
+				shooter.spawn_particles(pos, config.explosion_texture)
+			end
+		end
+	end
+	if type(spec.on_hit) == "function" then
+		return spec.on_hit(pointed_thing, spec, dir)
+	end
+end
+
 local function process_round(round)
 	round.dist = round.dist + round.spec.step
 	if round.dist > round.spec.range then
@@ -165,24 +187,9 @@ local function process_round(round)
 	local p1 = round.pos
 	local p2 = vector.add(p1, vector.multiply(round.dir, round.spec.step))
 	local ray = minetest.raycast(p1, p2, true, true)
-	local pointed_thing = ray:next() or {}
-	if pointed_thing.type == "node" then
-		if config.allow_nodes == true then
-			local pos = minetest.get_pointed_thing_position(pointed_thing, false)
-			shooter.punch_node(pos, round.spec)
-		end
-		return
-	elseif pointed_thing.type == "object" then
-		local object = pointed_thing.ref
-		if shooter.is_valid_object(object) == true then
-			local player = minetest.get_player_by_name(round.spec.user)
-			if player then
-				object:punch(player, nil, round.spec.tool_caps, round.dir)
-				local pos = pointed_thing.intersection_point or object:get_pos()
-				shooter.spawn_particles(pos, config.explosion_texture)
-			end
-		end
-		return
+	local pointed_thing = ray:next() or {type="nothing"}
+	if pointed_thing.type ~= "nothing" then
+		return process_hit(pointed_thing, round.spec, round.dir)
 	end
 	round.pos = p2
 	minetest.after(shooter.config.rounds_update_time, function(round)
