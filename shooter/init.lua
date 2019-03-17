@@ -54,3 +54,17 @@ minetest.register_entity("shooter:turret_entity", {
 		self.object:remove()
 	end,
 })
+
+-- Automatic Firing
+
+if shooter.config.automatic_weapons == true then
+	minetest.register_globalstep(function(dtime)
+		for _,player in pairs(minetest.get_connected_players()) do
+			local name = player:get_player_name()
+			if name then
+				shooter.set_shooting(name,
+					player:get_player_control().LMB == true)
+			end
+		end
+	end)
+end
