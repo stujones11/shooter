@@ -79,7 +79,8 @@ shooter.register_weapon = function(name, def)
 		description = def.description,
 		inventory_image = def.inventory_image,
 		on_use = function(itemstack, user)
-			if shooter.fire_weapon(user, itemstack, def.spec) then
+			local spec = table.copy(def.spec)
+			if shooter.fire_weapon(user, itemstack, spec) then
 				itemstack:add_wear(def.spec.wear)
 				if itemstack:get_count() == 0 then
 					itemstack = def.unloaded_item.name
