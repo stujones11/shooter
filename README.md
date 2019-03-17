@@ -32,7 +32,7 @@ Adds a crossbow with colored arrows.
 [mod] Flare Gun [shooter_flaregun]
 ----------------------------------
 
-Depends: default, tnt, wool
+Depends: shooter, tnt, wool
 
 Adds a flare-gun with temporary light emitting flares.
 
