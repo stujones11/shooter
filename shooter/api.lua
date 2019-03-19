@@ -197,7 +197,10 @@ local function process_hit(pointed_thing, spec, dir)
 			if player then
 				object:punch(player, nil, spec.tool_caps, dir)
 				local pos = pointed_thing.intersection_point or object:get_pos()
-				shooter.spawn_particles(pos, spec.particles)
+				local groups = object:get_armor_groups() or {}
+				if groups.fleshy then
+					shooter.spawn_particles(pos, spec.particles)
+				end
 			end
 		end
 	end

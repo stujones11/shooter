@@ -60,7 +60,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 			return
 		end
 		self.object:set_animation({x=self.pitch, y=self.pitch}, 0)
-		self.object:set_armor_groups({fleshy=0})
+		self.object:set_armor_groups({immortal=1})
 		-- Remove duplicates
 		get_turret_entity(self.pos)
 	end,
