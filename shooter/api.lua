@@ -77,7 +77,10 @@ shooter.register_weapon = function(name, def)
 	minetest.register_tool(name.."_loaded", {
 		description = def.description,
 		inventory_image = def.inventory_image,
-		on_use = function(itemstack, user)
+		on_use = function(itemstack, user, pointed_thing)
+			if type(def.on_use) == "function" then
+				itemstack = def.on_use, pointed_thing)
+			end
 			local spec = table.copy(def.spec)
 			if shooter.fire_weapon(user, itemstack, spec) then
 				itemstack:add_wear(def.spec.wear)
@@ -87,6 +90,7 @@ shooter.register_weapon = function(name, def)
 			end
 			return itemstack
 		end,
+		on_hit = def.on_hit,
 		groups = {not_in_creative_inventory=1},
 	})
 	-- Register unloaded item tool
@@ -204,8 +208,9 @@ local function process_hit(pointed_thing, spec, dir)
 			end
 		end
 	end
-	if type(spec.on_hit) == "function" then
-		return spec.on_hit(pointed_thing, spec, dir)
+	local def = minetest.registered_items[spec.name] or {}
+	if type(def.on_hit) == "function" then
+		return def.on_hit(pointed_thing, spec, dir)
 	end
 end
 
@@ -290,6 +295,7 @@ shooter.fire_weapon = function(player, itemstack, spec)
 		shooting[name] = true
 	end
 	spec.user = name
+	spec.name = itemstack:get_name()
 	fire_weapon(player, itemstack, spec)
 	return true
 end
