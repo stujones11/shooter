@@ -54,7 +54,7 @@ minetest.register_entity("shooter_grenade:grenade_entity", {
 			self.timer = 0
 		end
 	end,
-	get_staticdata = function(self)
+	get_staticdata = function()
 		return "expired"
 	end,
 })

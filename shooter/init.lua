@@ -35,13 +35,11 @@ local input = io.open(modpath.."/shooter.conf", "r")
 if input then
 	dofile(modpath.."/shooter.conf")
 	input:close()
-	input = nil
 end
 input = io.open(worldpath.."/shooter.conf", "r")
 if input then
 	dofile(worldpath.."/shooter.conf")
 	input:close()
-	input = nil
 end
 for name, _ in pairs(shooter.config) do
 	local global = "SHOOTER_"..name:upper()
@@ -63,6 +61,7 @@ for name, config in pairs(shooter.config) do
 		shooter.config[name] = setting
 	end
 end
+shooter.default_particles.texture = shooter.config.explosion_texture
 
 -- Legacy Entity Support
 
@@ -77,7 +76,7 @@ minetest.register_entity("shooter:turret_entity", {
 -- Automatic Firing
 
 if shooter.config.automatic_weapons == true then
-	minetest.register_globalstep(function(dtime)
+	minetest.register_globalstep(function()
 		for _,player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
 			if name then

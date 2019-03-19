@@ -78,7 +78,6 @@ local function strike(arrow, pointed_thing, name)
 	if pointed_thing.type == "object" then
 		local target = pointed_thing.ref
 		if shooter.is_valid_object(target) then
-			local puncher = minetest.get_player_by_name(name)
 			if puncher and puncher ~= target then
 				local groups = target:get_armor_groups() or {}
 				if groups.fleshy then
@@ -201,7 +200,7 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 			self.timer = 0
 		end
 	end,
-	get_staticdata = function(self)
+	get_staticdata = function()
 		return "expired"
 	end,
 })
@@ -215,7 +214,7 @@ for _, color in pairs(dye_basecolors) do
 		description = "Crossbow",
 		inventory_image = get_texture("crossbow_loaded", color),
 		groups = {not_in_creative_inventory=1},
-		on_use = function(itemstack, user, pointed_thing)
+		on_use = function(itemstack, user)
 			minetest.sound_play("shooter_click", {object=user})
 			if not minetest.setting_getbool("creative_mode") then
 				itemstack:add_wear(65535 / config.crossbow_uses)
@@ -245,7 +244,7 @@ for _, color in pairs(dye_basecolors) do
 					obj:set_animation({x=frame, y=frame}, 0)
 					obj:set_velocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
 					obj:set_acceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
-					pointed_thing = get_pointed_thing(pos, dir, 5)
+					local pointed_thing = get_pointed_thing(pos, dir, 5)
 					if pointed_thing then
 						strike(ent, pointed_thing, ent.user)
 					end
@@ -259,7 +258,7 @@ end
 minetest.register_tool("shooter_crossbow:crossbow", {
 	description = "Crossbow",
 	inventory_image = "shooter_crossbow.png",
-	on_use = function(itemstack, user, pointed_thing)
+	on_use = function(itemstack, user)
 		local inv = user:get_inventory()
 		local stack = inv:get_stack("main", user:get_wield_index() + 1)
 		local color = string.match(stack:get_name(), "shooter_crossbow:arrow_(%a+)")
@@ -270,13 +269,13 @@ minetest.register_tool("shooter_crossbow:crossbow", {
 			end
 			return "shooter_crossbow:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
 		end
-		for _, color in pairs(dye_basecolors) do
-			if inv:contains_item("main", "shooter_crossbow:arrow_"..color) then
+		for _, clr in pairs(dye_basecolors) do
+			if inv:contains_item("main", "shooter_crossbow:arrow_"..clr) then
 				minetest.sound_play("shooter_reload", {object=user})
 				if not minetest.setting_getbool("creative_mode") then
-					inv:remove_item("main", "shooter_crossbow:arrow_"..color.." 1")
+					inv:remove_item("main", "shooter_crossbow:arrow_"..clr.." 1")
 				end
-				return "shooter_crossbow:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
+				return "shooter_crossbow:crossbow_loaded_"..clr.." 1 "..itemstack:get_wear()
 			end
 		end
 		minetest.sound_play("shooter_click", {object=user})

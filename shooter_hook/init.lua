@@ -18,7 +18,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 ]]--
 
 local function throw_hook(itemstack, user, vel)
-	local inv = user:get_inventory()
 	local pos = user:get_pos()
 	local dir = user:get_look_dir()
 	local yaw = user:get_look_horizontal()
@@ -73,7 +72,7 @@ minetest.register_entity("shooter_hook:hook", {
 						minetest.get_node(pos).name == "air" then
 					local player = minetest.get_player_by_name(self.user)
 					if player then
-						player:moveto(pos)
+						player:move_to(pos)
 					end
 				end
 				if minetest.get_item_group(node.name, "lava") == 0 then
@@ -84,7 +83,7 @@ minetest.register_entity("shooter_hook:hook", {
 			self.timer = 0
 		end
 	end,
-	get_staticdata = function(self)
+	get_staticdata = function()
 		return "expired"
 	end,
 })
@@ -104,9 +103,9 @@ minetest.register_tool("shooter_hook:grapple_hook", {
 minetest.register_tool("shooter_hook:grapple_gun", {
 	description = "Grappling Gun",
 	inventory_image = "shooter_hook_gun.png",
-	on_use = function(itemstack, user, pointed_thing)
+	on_use = function(itemstack, user)
 		local inv = user:get_inventory()
-		if inv:contains_item("main", "shooter_hook:grapple_hook") and 
+		if inv:contains_item("main", "shooter_hook:grapple_hook") and
 				inv:contains_item("main", "tnt:gunpowder") then
 			inv:remove_item("main", "tnt:gunpowder")
 			minetest.sound_play("shooter_reload", {object=user})

@@ -53,7 +53,6 @@ shooter.default_particles = {
 	texture = "shooter_hit.png",
 }
 
-local rounds = {}
 local shots = {}
 local shooting = {}
 local config = shooter.config
@@ -78,16 +77,20 @@ shooter.register_weapon = function(name, def)
 	minetest.register_tool(name.."_loaded", {
 		description = def.description,
 		inventory_image = def.inventory_image,
-		on_use = function(itemstack, user)
+		on_use = function(itemstack, user, pointed_thing)
+			if type(def.on_use) == "function" then
+				itemstack = def.on_use, pointed_thing)
+			end
 			local spec = table.copy(def.spec)
 			if shooter.fire_weapon(user, itemstack, spec) then
 				itemstack:add_wear(def.spec.wear)
 				if itemstack:get_count() == 0 then
-					itemstack = def.unloaded_item.name
+					itemstack:replace(def.unloaded_item.name)
 				end
 			end
 			return itemstack
 		end,
+		on_hit = def.on_hit,
 		groups = {not_in_creative_inventory=1},
 	})
 	-- Register unloaded item tool
@@ -95,16 +98,16 @@ shooter.register_weapon = function(name, def)
 		description = def.unloaded_item.description,
 		inventory_image = def.unloaded_item.inventory_image,
 		groups = def.unloaded_item.groups or {},
-		on_use = function(itemstack, user, pointed_thing)
+		on_use = function(itemstack, user)
 			local inv = user:get_inventory()
 			if inv then
 				local stack = def.reload_item
 				if inv:contains_item("main", stack) then
-					minetest.sound_play((def.sounds.reload), {object=user})
+					minetest.sound_play(def.sounds.reload, {object=user})
 					inv:remove_item("main", stack)
 					itemstack:replace(name.."_loaded 1 1")
 				else
-					minetest.sound_play((def.sounds.fail_shot), {object=user})
+					minetest.sound_play(def.sounds.fail_shot, {object=user})
 				end
 			end
 			return itemstack
@@ -188,11 +191,9 @@ shooter.is_valid_object = function(object)
 end
 
 local function process_hit(pointed_thing, spec, dir)
-	if pointed_thing.type == "node" then
-		if config.allow_nodes == true then
-			local pos = minetest.get_pointed_thing_position(pointed_thing, false)
-			shooter.punch_node(pos, spec)
-		end
+	if pointed_thing.type == "node" and config.allow_nodes == true then
+		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
+		shooter.punch_node(pos, spec)
 	elseif pointed_thing.type == "object" then
 		local object = pointed_thing.ref
 		if shooter.is_valid_object(object) == true then
@@ -200,12 +201,16 @@ local function process_hit(pointed_thing, spec, dir)
 			if player then
 				object:punch(player, nil, spec.tool_caps, dir)
 				local pos = pointed_thing.intersection_point or object:get_pos()
-				shooter.spawn_particles(pos, spec.particles)
+				local groups = object:get_armor_groups() or {}
+				if groups.fleshy then
+					shooter.spawn_particles(pos, spec.particles)
+				end
 			end
 		end
 	end
-	if type(spec.on_hit) == "function" then
-		return spec.on_hit(pointed_thing, spec, dir)
+	local def = minetest.registered_items[spec.name] or {}
+	if type(def.on_hit) == "function" then
+		return def.on_hit(pointed_thing, spec, dir)
 	end
 end
 
@@ -222,8 +227,8 @@ local function process_round(round)
 		return process_hit(pointed_thing, round.spec, round.dir)
 	end
 	round.pos = p2
-	minetest.after(shooter.config.rounds_update_time, function(round)
-		process_round(round)
+	minetest.after(shooter.config.rounds_update_time, function(...)
+		process_round(...)
 	end, round)
 end
 
@@ -268,9 +273,10 @@ local function fire_weapon(player, itemstack, spec, extended)
 	end
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
-	minetest.after(interval, function(player, itemstack, spec)
+	minetest.after(interval, function(...)
 		if shooting[spec.user] then
-			fire_weapon(player, itemstack, spec, true)
+			local arg = {...}
+			fire_weapon(arg[1], arg[2], arg[3], true)
 		end
 	end, player, itemstack, spec)
 end
@@ -289,6 +295,7 @@ shooter.fire_weapon = function(player, itemstack, spec)
 		shooting[name] = true
 	end
 	spec.user = name
+	spec.name = itemstack:get_name()
 	fire_weapon(player, itemstack, spec)
 	return true
 end
@@ -297,8 +304,8 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 	if not user then
 		return
 	end
+	pos = vector.round(pos)
 	local name = user:get_player_name()
-	local pos = vector.round(pos)
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
 	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
@@ -376,8 +383,11 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 		vm:set_data(data)
 		vm:update_liquids()
 		vm:write_to_map()
-		vm:update_map()
 	end
+end
+
+shooter.get_shooting = function(name)
+	return shooting[name]
 end
 
 shooter.set_shooting = function(name, is_shooting)

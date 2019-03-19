@@ -52,7 +52,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 	pitch = 40,
 	yaw = 0,
 	firing = false,
-	on_activate = function(self, staticdata)
+	on_activate = function(self)
 		self.pos = self.object:get_pos()
 		self.yaw = self.object:get_yaw()
 		if minetest.get_node(self.pos).name ~= "shooter_turret:turret" then
@@ -60,7 +60,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 			return
 		end
 		self.object:set_animation({x=self.pitch, y=self.pitch}, 0)
-		self.object:set_armor_groups({fleshy=0})
+		self.object:set_armor_groups({immortal=1})
 		-- Remove duplicates
 		get_turret_entity(self.pos)
 	end,
@@ -120,7 +120,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 				end
 				if pitch < 0 then
 					pitch = 0
-				elseif pitch > 90 then 
+				elseif pitch > 90 then
 					pitch = 90
 				end
 				if self.pitch ~= pitch then
@@ -222,7 +222,7 @@ minetest.register_node("shooter_turret:turret", {
 		local inv = meta:get_inventory()
 		inv:set_size("main", 16)
 	end,
-	after_place_node = function(pos, placer)
+	after_place_node = function(pos)
 		local node = minetest.get_node({x=pos.x, y=pos.y + 1, z=pos.z})
 		if node.name == "air" then
 			if not get_turret_entity(pos) then
@@ -230,12 +230,12 @@ minetest.register_node("shooter_turret:turret", {
 			end
 		end
 	end,
-	can_dig = function(pos, player)
+	can_dig = function(pos)
 		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 		return inv:is_empty("main")
 	end,
-	after_destruct = function(pos, oldnode)
+	after_destruct = function(pos)
 		local ent = get_turret_entity(pos)
 		if ent then
 			ent.object:remove()
@@ -243,7 +243,7 @@ minetest.register_node("shooter_turret:turret", {
 	end,
 	mesecons = {
 		effector = {
-			action_on = function(pos, node)
+			action_on = function(pos)
 				local ent = get_turret_entity(pos)
 				if ent then
 					if ent.firing == false then
@@ -252,7 +252,7 @@ minetest.register_node("shooter_turret:turret", {
 					end
 				end
 			end,
-			action_off = function(pos, node)
+			action_off = function(pos)
 				local ent = get_turret_entity(pos)
 				if ent then
 					ent.firing = false
@@ -266,7 +266,7 @@ minetest.register_abm({
 	nodenames = {"shooter_turret:turret"},
 	interval = 15,
 	chance = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
+	action = function(pos)
 		if not get_turret_entity(pos) then
 			minetest.add_entity(pos, "shooter_turret:turret_entity")
 		end
