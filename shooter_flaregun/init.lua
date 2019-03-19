@@ -39,7 +39,7 @@ minetest.register_abm({
 	nodenames = "shooter_flaregun:flare_light",
 	interval = 5,
 	chance = 1,
-	action = function(pos, node)
+	action = function(pos)
 		local time = os.time()
 		local meta = minetest.get_meta(pos)
 		local init_time = meta:get_int("init_time") or 0
@@ -112,8 +112,8 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 						loop = true,
 						max_hear_distance = 8,
 					})
-					minetest.after(30, function(sound)
-						minetest.sound_stop(sound)
+					minetest.after(30, function(...)
+						minetest.sound_stop(...)
 					end, sound)
 				end
 				self.object:remove()
@@ -121,7 +121,7 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 			self.timer = 0
 		end
 	end,
-	get_staticdata = function(self)
+	get_staticdata = function()
 		return "expired"
 	end,
 })
@@ -129,7 +129,7 @@ minetest.register_entity("shooter_flaregun:flare_entity", {
 minetest.register_tool("shooter_flaregun:flaregun", {
 	description = "Flare Gun",
 	inventory_image = "shooter_flaregun.png",
-	on_use = function(itemstack, user, pointed_thing)
+	on_use = function(itemstack, user)
 		local inv = user:get_inventory()
 		if not inv:contains_item("main", "shooter_flaregun:flare") then
 			minetest.sound_play("shooter_click", {object=user})

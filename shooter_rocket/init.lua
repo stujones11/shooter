@@ -60,7 +60,7 @@ minetest.register_entity("shooter_rocket:rocket_entity", {
 			self.timer = 0
 		end
 	end,
-	get_staticdata = function(self)
+	get_staticdata = function()
 		return "expired"
 	end,
 })
@@ -105,7 +105,7 @@ minetest.register_tool("shooter_rocket:rocket_gun_loaded", {
 minetest.register_tool("shooter_rocket:rocket_gun", {
 	description = "Rocket Gun",
 	inventory_image = "shooter_rocket_gun.png",
-	on_use = function(itemstack, user, pointed_thing)
+	on_use = function(itemstack, user)
 		local inv = user:get_inventory()
 		if inv:contains_item("main", "shooter_rocket:rocket") then
 			minetest.sound_play("shooter_reload", {object=user})
