@@ -1,2 +1,0 @@
-Shooter Mod API.
-Handles raycasting, blasting and audio-visual effects of dependent mods.

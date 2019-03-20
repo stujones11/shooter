@@ -1,3 +1,0 @@
-wool
-dye
-shooter
