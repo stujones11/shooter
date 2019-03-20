@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 local config = {
 	crossbow_uses = 50,
 	arrow_lifetime = 180,
+	arrow_fleshy = 2,
 	arrow_object_attach = false,
 }
 
@@ -30,13 +31,13 @@ for name, _ in pairs(config) do
 	if minetest.global_exists(global) then
 		config[name] = _G[global]
 	end
-	local setting = minetest.settings:get("shooter_"..name)
-	if type(setting) == "string" then
-		config[name] = tonumber(setting)
-	end
 end
 
-local arrow_tool_caps = {damage_groups={fleshy=2}}
+-- Load configuration
+
+config = shooter.get_configuration(config)
+
+local arrow_tool_caps = {damage_groups={fleshy=config.arrow_fleshy}}
 if minetest.global_exists("SHOOTER_ARROW_TOOL_CAPS") then
 	arrow_tool_caps = table.copy(SHOOTER_ARROW_TOOL_CAPS)
 end

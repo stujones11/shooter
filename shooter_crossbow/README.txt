@@ -5,6 +5,18 @@ Depends: shooter, wool, dye
 
 Adds a crossbow with colored arrows.
 
+Configuration
+=============
+
+Override the following default settings by adding them to your minetest.conf file
+
+* `shooter_crossbow_uses = 50`: Number of crossbow uses
+* `shooter_arrow_lifetime = 180`: Arrow exipiry time in seconds
+* `shooter_arrow_fleshy = 2`: Arrow 'fleshy' damage level
+* `shooter_arrow_object_attach = false`: Attach arrows to objects when hit
+	* Experimental, currently does not work well with oversized selection boxes!
+
+
 Crafting
 ========
 
