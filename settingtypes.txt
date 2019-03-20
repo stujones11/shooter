@@ -1,0 +1,21 @@
+[shooter]
+
+shooter_automatic_weapons (Enable automatic weapons) bool true
+shooter_admin_weapons (Enable admin super weapons) bool false
+shooter_enable_blasting (Enable node destruction with explosives) bool false
+shooter_enable_particle_fx (Enable hit particle effects) bool true
+shooter_enable_protection (Respect protection mods) bool false
+shooter_enable_crafting (Allow crafting of weapons) bool true
+shooter_explosion_texture (Hit particle texture for 'fleshy' object, inc. players) string shooter_hit.png
+shooter_allow_nodes (Allow node destruction) bool true
+shooter_allow_entities (Allow damage to active objects in multiplayer mode) bool false
+shooter_allow_players (Allow damage to players in multiplayer mode) bool true
+shooter_rounds_update_time (Round update time, should be >= dedicated server step) float 0.4
+shooter_camera_height (Camera height used for raycasting) float 1.5
+
+[shooter_crossbow]
+
+shooter_crossbow_uses (Number of crossbow uses) int 5
+shooter_arrow_lifetime (Arrow exipiry time in seconds) int 180
+shooter_arrow_fleshy (Arrow 'fleshy' damage level) float 2
+shooter_arrow_object_attach (Experimental, attach arrows to objects when hit) bool false
