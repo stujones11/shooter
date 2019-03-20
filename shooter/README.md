@@ -36,13 +36,13 @@ Allows admins (server priv) shoot all guns automatically
 
 ### Enable protection
 
-Requires a protection mod that utilizes `minetest.is_protected()`, tested with TenPlus1's version of the [protector] mod
+Requires a protection mod that utilizes `minetest.is_protected()`
 
 `shooter_enable_protection = false`
 
 ### Particle texture
 
-Particle texture used when a player or entity with the 'fleshy' group is hit
+Particle texture used when a player or entity with the 'fleshy' armor group is hit
 
 `shooter_explosion = "shooter_hit.png"`
 
@@ -51,11 +51,13 @@ Particle texture used when a player or entity with the 'fleshy' group is hit
 `shooter_allow_nodes = true`
 
 ### Allow entities
+
 Defaults to `true` in singleplayer mode
 
 `shooter_allow_entities = false`
 
 ### Allow players
+
 Defaults to `false` in singleplayer mode
 
 `shooter_allow_players = true`
@@ -66,6 +68,12 @@ Maximum round 'step' processing interval, will inversely effect the long-range v
 
 `shooter_rounds_update_time = 0.4`
 
+### Camera Height
+
+Player eye offset used for rayasting and particle effects
+
+`shooter_camera_height = 1.5`
+
 API Documentation
 -----------------
 
@@ -73,24 +81,41 @@ API Documentation
 
 * `shooter.registered_weapons`: Registered weapons by itemstring
 * `shooter.config`: Present configuration
-* `shooter.default_particles`: Default hit paricle definition
-
+* `shooter.default_particles`: Default hit particle definition
+```Lua
+{
+	amount = 15,
+	time = 0.3,
+	minpos = {x=-0.1, y=-0.1, z=-0.1},
+	maxpos = {x=0.1, y=0.1, z=0.1},
+	minvel = {x=-1, y=1, z=-1},
+	maxvel = {x=1, y=2, z=1},
+	minacc = {x=-2, y=-2, z=-2},
+	maxacc = {x=2, y=-2, z=2},
+	minexptime = 0.1,
+	maxexptime = 0.75,
+	minsize = 1,
+	maxsize = 2,
+	collisiondetection = false,
+	texture = "shooter_hit.png",
+}
+```
 ### Methods
 
 * `shooter.register_weapon(name, definition)`: Register a shooting weapon. -- See "Weapon Definition"
 * `shooter.spawn_particles(pos, particles)`: Adds particles at the specified position
 	* `particles` is an optional table of overrides for `shooter.default_particles`
 * `shooter.play_node_sound(node, pos)`: Plays the registered 'dug' sound for the node at `pos`
-* `shooter.punch_node(pos, spec)`: Punches the node at `pos` with the `spec` tool caps
+* `shooter.punch_node(pos, spec)`: Punches the node at `pos` with the `spec` group capabilities
 * `shooter.is_valid_object(object)`: Returns `true` if the object can be damaged
 * `shooter.fire_weapon(player, itemstack, spec)`: Adds a 'round' with `spec` to the processing que
-* `shooter.blast(pos, radius, fleshy, distance, user`: Create explosion at `pos`
+* `shooter.blast(pos, radius, fleshy, distance, user)`: Create explosion at `pos`
 	* `radius`: Blast radius in nodes
 	* `fleshy`: Damage to inflict on fleshy objects: `(fleshy * 0.5 ^ distance) * 2`
 	* `distance`: Area of effect for objects
 	* `user`: A player reference, used for protection and object damage
-* `shooter.get_shooting(name)`: Returns true if player `name` is holding the left mouse button
-	* Requires `shooter_automatic_weapons` to be true
+* `shooter.get_shooting(name)`: Returns `true` if player `name` is holding the left mouse button or `nil`
+	* Requires `shooter_automatic_weapons` to be set `true`
 * `shooter.set_shooting(name, is_shooting)`: Sets the left mouse button status of player `name`
 
 Weapon Definition
