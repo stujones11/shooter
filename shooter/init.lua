@@ -50,17 +50,7 @@ end
 
 -- Load Configuration
 
-for name, config in pairs(shooter.config) do
-	local setting = minetest.settings:get("shooter_"..name)
-	if type(config) == "number" then
-		setting = tonumber(setting)
-	elseif type(config) == "boolean" then
-		setting = minetest.settings:get_bool("shooter_"..name)
-	end
-	if setting ~= nil then
-		shooter.config[name] = setting
-	end
-end
+shooter.config = shooter.get_configuration(shooter.config)
 shooter.default_particles.texture = shooter.config.explosion_texture
 
 -- Legacy Entity Support

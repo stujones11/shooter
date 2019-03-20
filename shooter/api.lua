@@ -79,7 +79,7 @@ shooter.register_weapon = function(name, def)
 		inventory_image = def.inventory_image,
 		on_use = function(itemstack, user, pointed_thing)
 			if type(def.on_use) == "function" then
-				itemstack = def.on_use, pointed_thing)
+				itemstack = def.on_use(itemstack, user, pointed_thing)
 			end
 			local spec = table.copy(def.spec)
 			if shooter.fire_weapon(user, itemstack, spec) then
@@ -113,6 +113,21 @@ shooter.register_weapon = function(name, def)
 			return itemstack
 		end,
 	})
+end
+
+shooter.get_configuration = function(conf)
+	for k, v in pairs(conf) do
+		local setting = minetest.settings:get("shooter_"..k)
+		if type(v) == "number" then
+			setting = tonumber(setting)
+		elseif type(v) == "boolean" then
+			setting = minetest.settings:get_bool("shooter_"..k)
+		end
+		if setting ~= nil then
+			conf[k] = setting
+		end
+	end
+	return conf
 end
 
 shooter.spawn_particles = function(pos, particles)

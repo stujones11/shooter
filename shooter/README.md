@@ -103,6 +103,7 @@ API Documentation
 ### Methods
 
 * `shooter.register_weapon(name, definition)`: Register a shooting weapon. -- See "Weapon Definition"
+* `shooter.get_configuration(config)`: Loads matching config settings into a table ref `config`
 * `shooter.spawn_particles(pos, particles)`: Adds particles at the specified position
 	* `particles` is an optional table of overrides for `shooter.default_particles`
 * `shooter.play_node_sound(node, pos)`: Plays the registered 'dug' sound for the node at `pos`
