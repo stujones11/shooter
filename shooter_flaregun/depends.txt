@@ -1,3 +1,0 @@
-shooter
-tnt
-wool
