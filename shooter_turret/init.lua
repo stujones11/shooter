@@ -185,7 +185,7 @@ minetest.register_entity("shooter_turret:turret_entity", {
 				minsize = 8,
 				maxsize = 15,
 				collisiondetection = false,
-				texture = "tnt_smoke.png",
+				texture = "shooter_smoke.png",
 			})
 		end
 	end

@@ -323,14 +323,15 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 	local name = user:get_player_name()
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
-	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
+	minetest.sound_play("shooter_explode", {
+		pos = pos,
+		gain = 10,
+		max_hear_distance = 100
+	})
 	if config.allow_nodes and config.enable_blasting then
-		if config.enable_protection then
-			if not minetest.is_protected(pos, name) then
-				minetest.set_node(pos, {name="tnt:boom"})
-			end
-		else
-			minetest.set_node(pos, {name="tnt:boom"})
+		if not config.enable_protection or
+				not minetest.is_protected(pos, name) then
+			minetest.set_node(pos, {name="shooter:boom"})
 		end
 	end
 	if config.enable_particle_fx == true then
@@ -348,7 +349,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 			minsize = 8,
 			maxsize = 15,
 			collisiondetection = false,
-			texture = "tnt_smoke.png",
+			texture = "shooter_smoke.png",
 		})
 	end
 	local objects = minetest.get_objects_inside_radius(pos, distance)

@@ -1,7 +1,7 @@
 Minetest Mod - Grenade [shooter_grenade]
 ========================================
 
-Depends: shooter, tnt
+Depends: shooter
 
 Adds simple hand grenades.
 
@@ -9,7 +9,7 @@ Crafting
 ========
 
 S = Steel Ingot  [default:steel_ingot]
-G = Gun Powder   [tnt:gunpowder]
+G = Gunpowder    [shooter:gunpowder]
 
 Grenade: [shooter_grenade:grenade]
 

@@ -1,7 +1,7 @@
 Minetest Mod - Rocket Launcher [shooter_rocket]
 ===============================================
 
-Depends: shooter, tnt
+Depends: shooter
 
 Adds rocket missiles and launching gun.
 
@@ -11,7 +11,7 @@ Crafting
 S = Steel Ingot  [default:steel_ingot]
 B = Bronze Ingot [default:bronze_ingot]
 D = Diamond      [default:diamond]
-G = Gun Powder   [tnt:gunpowder]
+G = Gunpowder    [shooter:gunpowder]
 
 Rocket: [shooter_rocket:rocket]
 

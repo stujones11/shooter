@@ -106,8 +106,8 @@ minetest.register_tool("shooter_hook:grapple_gun", {
 	on_use = function(itemstack, user)
 		local inv = user:get_inventory()
 		if inv:contains_item("main", "shooter_hook:grapple_hook") and
-				inv:contains_item("main", "tnt:gunpowder") then
-			inv:remove_item("main", "tnt:gunpowder")
+				inv:contains_item("main", "shooter:gunpowder") then
+			inv:remove_item("main", "shooter:gunpowder")
 			minetest.sound_play("shooter_reload", {object=user})
 			local stack = inv:remove_item("main", "shooter_hook:grapple_hook")
 			itemstack = "shooter_hook:grapple_gun_loaded 1 "..stack:get_wear()

@@ -159,14 +159,13 @@ minetest.register_tool("shooter_flaregun:flaregun", {
 if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_flaregun:flare",
-		recipe = {
-			{"tnt:gunpowder", "wool:red"},
-		},
+		type = "shapeless",
+		recipe = {"shooter:gunpowder", "default:paper"},
 	})
 	minetest.register_craft({
 		output = "shooter_flaregun:flaregun",
 		recipe = {
-			{"wool:red", "wool:red", "wool:red"},
+			{"default:copper_ingot", "default:copper_ingot", "default:copper_ingot"},
 			{"", "", "default:steel_ingot"}
 		},
 	})

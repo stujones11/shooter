@@ -25,35 +25,37 @@ Adds basic guns using the shooter API.
 [mod] Crossbow [shooter_crossbow]
 ---------------------------------
 
-Depends: shooter, wool, dye
+Depends: shooter
+
+Optional Depends: dye (required for colored arrows)
 
 Adds a crossbow with colored arrows.
 
 [mod] Flare Gun [shooter_flaregun]
 ----------------------------------
 
-Depends: shooter, tnt, wool
+Depends: shooter
 
 Adds a flare-gun with temporary light emitting flares.
 
 [mod] Grenade [shooter_grenade]
 -------------------------------
 
-Depends: shooter, tnt
+Depends: shooter
 
 Adds simple hand grenades.
 
 [mod] Rocket Launcher [shooter_rocket]
 --------------------------------------
 
-Depends: shooter, tnt
+Depends: shooter
 
 Adds rocket missiles and launching gun.
 
 [mod] Grapple Hook [shooter_hook]
 ---------------------------------
 
-Depends: shooter, tnt
+Depends: shooter
 
 Adds a teleporting grapple hook which can be thrown or launched
 further from a grapple hook gun.
