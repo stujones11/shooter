@@ -29,3 +29,5 @@ License Sounds: freesound.org
 	AGM-114 Hellfire Rocket Missile Launch.flac by qubodup - CC0 1.0 Universal (CC0 1.0)
 
 	Sparkler.aif by Ned Bouhalassa - CC0 1.0 Universal (CC0 1.0)
+
+	explosion10.wav by V-ktor - CC0 1.0 Universal (CC0 1.0)

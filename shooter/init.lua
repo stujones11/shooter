@@ -76,3 +76,26 @@ if shooter.config.automatic_weapons == true then
 		end
 	end)
 end
+
+minetest.register_node("shooter:boom", {
+	drawtype = "airlike",
+	light_source = 14,
+	walkable = false,
+	drop = "",
+	groups = {dig_immediate = 3},
+	-- unaffected by explosions
+	on_blast = function() end,
+})
+
+minetest.register_craftitem("shooter:gunpowder", {
+	description = "Gunpowder",
+	inventory_image = "shooter_powder.png",
+})
+
+if shooter.config.enable_crafting then
+	minetest.register_craft({
+		output = "shooter:gunpowder 5",
+		type = "shapeless",
+		recipe = {"default:coal_lump", "default:clay_lump"},
+	})
+end

@@ -5,6 +5,17 @@ Depends: default
 
 Handles raycasting, blasting and audio-visual effects of dependent mods
 
+Crafting
+--------
+
+### Gunpowder
+
+1 x Coal Lump + 1 x Clay Lump = 5 x Gunpowder (shapeless)
+```
+	output = "shooter:gunpowder 5",
+	type = "shapeless",
+	recipe = {"default:coal_lump", "default:clay_lump"},
+```
 Configuration
 -------------
 

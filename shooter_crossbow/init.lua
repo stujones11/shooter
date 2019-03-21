@@ -300,14 +300,16 @@ if shooter.config.enable_crafting == true then
 			{"", "default:paper", "default:stick"},
 		},
 	})
-	for _, color in pairs(dye_basecolors) do
-		if color ~= "white" then
-			minetest.register_craft({
-				output = "shooter_crossbow:arrow_"..color,
-				recipe = {
-					{"", "dye:"..color, "shooter_crossbow:arrow_white"},
-				},
-			})
+	if minetest.get_modpath("dye") then
+		for _, color in pairs(dye_basecolors) do
+			if color ~= "white" then
+				minetest.register_craft({
+					output = "shooter_crossbow:arrow_"..color,
+					recipe = {
+						{"", "dye:"..color, "shooter_crossbow:arrow_white"},
+					},
+				})
+			end
 		end
 	end
 end

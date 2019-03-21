@@ -97,9 +97,8 @@ minetest.register_tool("shooter_grenade:grenade", {
 if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_grenade:grenade",
-		recipe = {
-			{"tnt:gunpowder", "default:steel_ingot"},
-		},
+		type = "shapeless",
+		recipe = {"shooter:gunpowder", "default:steel_ingot"},
 	})
 end
 

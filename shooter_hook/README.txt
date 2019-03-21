@@ -1,7 +1,7 @@
 Minetest Mod - Grapple Hook [shooter_hook]
 ==========================================
 
-Depends: shooter, tnt
+Depends: shooter
 
 Adds a teleporting grapple hook which can be thrown or launched
 further from a grapple hook gun.

@@ -11,7 +11,7 @@ Crafting
 S = Steel Ingot  [default:steel_ingot]
 B = Bronze Ingot [default:bronze_ingot]
 M = Mese Crystal [default:mese_crysytal]
-G = Gun Powder   [tnt:gunpowder]
+G = Gunpowder    [shooter:gunpowder]
 
 Pistol: [shooter_guns:pistol]
 

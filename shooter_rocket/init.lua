@@ -130,9 +130,8 @@ if shooter.config.enable_crafting == true then
 	})
 	minetest.register_craft({
 		output = "shooter_rocket:rocket",
-		recipe = {
-			{"default:bronze_ingot", "tnt:gunpowder", "default:bronze_ingot"},
-		},
+		type = "shapeless",
+		recipe = {"default:bronze_ingot", "shooter:gunpowder", "default:bronze_ingot"},
 	})
 end
 
