@@ -29,7 +29,8 @@ Uses globalstep to detect left mouse button
 
 ### Enable admin super weapons
 
-Allows admins (server priv) shoot all guns automatically
+Allows admins (server priv) to shoot all guns automatically
+Requires `shooter_automatic_weapons` to be `true`
 
 `shooter_admin_weapons = false`
 
@@ -156,6 +157,8 @@ Used by `shooter.register_weapon`
 			-- Number of rounds, refilled by the defined reload item
 		range = 200,
 			-- Range (in nodes) of each shot
+		step = 30,
+			-- Distance per `shooter_rounds_update_time`
 		tool_caps = {
 			-- Tool capabilities, used for object/player damage
 			full_punch_interval = 1.0,
@@ -163,10 +166,10 @@ Used by `shooter.register_weapon`
 		},
 		groups = {
 			-- Damage groups, used to effect nodes as a normal tool item would
-			snappy=3,
-			crumbly=3,
-			choppy=3,
-			fleshy=2,
+			snappy = 3,
+			crumbly = 3,
+			choppy = 3,
+			fleshy = 2,
 			oddly_breakable_by_hand=2
 		},
 		sounds = {
