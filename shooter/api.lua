@@ -206,6 +206,12 @@ shooter.is_valid_object = function(object)
 end
 
 local function process_hit(pointed_thing, spec, dir)
+	local def = minetest.registered_items[spec.name] or {}
+	if type(def.on_hit) == "function" then
+		if def.on_hit(pointed_thing, spec, dir) == true then
+			return
+		end
+	end
 	if pointed_thing.type == "node" and config.allow_nodes == true then
 		local pos = minetest.get_pointed_thing_position(pointed_thing, false)
 		shooter.punch_node(pos, spec)
@@ -222,10 +228,6 @@ local function process_hit(pointed_thing, spec, dir)
 				end
 			end
 		end
-	end
-	local def = minetest.registered_items[spec.name] or {}
-	if type(def.on_hit) == "function" then
-		return def.on_hit(pointed_thing, spec, dir)
 	end
 end
 

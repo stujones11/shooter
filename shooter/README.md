@@ -150,6 +150,7 @@ Used by `shooter.register_weapon`
 	},
 	on_hit = function(pointed_thing, spec, dir)
 		-- May be used for arbitary shot effects like knock-back, etc.
+		-- Return `true` to override built-in damage effects
 	end,
 	spec = {
 		-- Weapon specifications
