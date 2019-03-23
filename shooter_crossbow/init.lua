@@ -132,7 +132,7 @@ minetest.register_entity("shooter_crossbow:arrow_entity", {
 			acceleration = {x=0, y=0, z=0}
 		end
 		if pos then
-			self.object:moveto(pos)
+			self.object:move_to(pos)
 		end
 		self.object:set_properties({
 			physical = true,
