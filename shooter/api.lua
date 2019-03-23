@@ -207,11 +207,13 @@ end
 
 shooter.punch_object = function(object, tool_caps, dir, on_blast)
 	local do_damage = true
-	if on_blast then
+	if on_blast and not object:is_player() then
 		local ent = object:get_luaentity()
-		local def = minetest.registered_entities[ent.name]
-		if def.on_blast then
-			do_damage = def.on_blast(ent, tool_caps.fleshy)
+		if ent then
+			local def = minetest.registered_entities[ent.name] or {}
+			if def.on_blast then
+				do_damage = def.on_blast(ent, tool_caps.fleshy)
+			end
 		end
 	end
 	if do_damage then
