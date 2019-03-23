@@ -260,8 +260,8 @@ local function fire_weapon(player, itemstack, spec, extended)
 	end
 	pos.y = pos.y + config.camera_height
 	spec.origin = vector.add(pos, dir)
-	shots[spec.user] = minetest.get_us_time() / 1000000 +
-		spec.tool_caps.full_punch_interval
+	local interval = spec.tool_caps.full_punch_interval
+	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	minetest.sound_play(spec.sound, {object=player})
 	if spec.bullet_image then
 		minetest.add_particle({

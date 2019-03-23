@@ -139,8 +139,8 @@ if shooter.config.enable_crafting == true then
 end
 
 --Backwards compatibility
-minetest.register_alias("shooter:shotgun", "shooter_guns:shotgun")
-minetest.register_alias("shooter:pistol", "shooter_guns:pistol")
-minetest.register_alias("shooter:machine_gun", "shooter_guns:machine_gun")
-minetest.register_alias("shooter:rifle", "shooter_guns:rifle")
+minetest.register_alias("shooter:shotgun", "shooter_guns:shotgun_loaded")
+minetest.register_alias("shooter:pistol", "shooter_guns:pistol_loaded")
+minetest.register_alias("shooter:machine_gun", "shooter_guns:machine_gun_loaded")
+minetest.register_alias("shooter:rifle", "shooter_guns:rifle_loaded")
 minetest.register_alias("shooter:ammo", "shooter_guns:ammo")
