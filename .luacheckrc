@@ -7,10 +7,7 @@ read_globals = {
 	"VoxelManip",
 	"PseudoRandom",
 
-	string = {fields = {"split"}},
 	table  = {fields = {"copy"}},
-	math   = {fields = {"hypot"}},
-	os     = {fields = {"time"}},
 }
 
 globals = {
