@@ -259,6 +259,9 @@ local function fire_weapon(player, itemstack, spec, extended)
 		return
 	end
 	pos.y = pos.y + config.camera_height
+	spec.origin = vector.add(pos, dir)
+	shots[spec.user] = minetest.get_us_time() / 1000000 +
+		spec.tool_caps.full_punch_interval
 	minetest.sound_play(spec.sound, {object=player})
 	if spec.bullet_image then
 		minetest.add_particle({
@@ -272,7 +275,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 	end
 	process_round({
 		spec = spec,
-		pos = vector.add(pos, dir),
+		pos = vector.new(spec.origin),
 		dir = dir,
 		dist = 0,
 	})
@@ -288,8 +291,6 @@ local function fire_weapon(player, itemstack, spec, extended)
 	if not spec.automatic or not shooting[spec.user] then
 		return
 	end
-	local interval = spec.tool_caps.full_punch_interval
-	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	minetest.after(interval, function(...)
 		if shooting[spec.user] then
 			local arg = {...}

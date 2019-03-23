@@ -151,6 +151,12 @@ Used by `shooter.register_weapon`
 	on_hit = function(pointed_thing, spec, dir)
 		-- May be used for arbitary shot effects like knock-back, etc.
 		-- Return `true` to override built-in damage effects
+		-- `pointed_thing`: Returned by `minetest.raycast()`
+		-- `spec`: Gunspec of the weapon used including addition fields
+			-- `name`: Name of the weapon item, eg. `shooter_guns:rifle`
+			-- `user`: Name of the player that fired the weapon
+			-- `origin`: Initial starting position of the shot
+		-- `dir`: Direction of the virtual shot before impact
 	end,
 	spec = {
 		-- Weapon specifications
