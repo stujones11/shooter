@@ -10,11 +10,11 @@ Crafting
 
 ### Gunpowder
 
-1 x Coal Lump + 1 x Clay Lump = 5 x Gunpowder (shapeless)
+1 x Coal Lump + 1 x Clay Lump = 5 x Gunpowder
 ```
-	output = "shooter:gunpowder 5",
-	type = "shapeless",
-	recipe = {"default:coal_lump", "default:clay_lump"},
+output = "shooter:gunpowder 5",
+type = "shapeless",
+recipe = {"default:coal_lump", "default:clay_lump"},
 ```
 Configuration
 -------------
@@ -119,8 +119,14 @@ API Documentation
 * `shooter.spawn_particles(pos, particles)`: Adds particles at the specified position
 	* `particles` is an optional table of overrides for `shooter.default_particles`
 * `shooter.play_node_sound(node, pos)`: Plays the registered 'dug' sound for the node at `pos`
-* `shooter.punch_node(pos, spec)`: Punches the node at `pos` with the `spec` group capabilities
 * `shooter.is_valid_object(object)`: Returns `true` if the object can be damaged
+* `shooter.punch_node(pos, spec)`: Punches the node at `pos` with the `spec` group capabilities
+* `shooter.punch_object(object, tool_caps, dir, on_blast)`: Punches the object
+	* Returns `true` if the object is damaged
+	* `object`: Object to punched, not checked for validity!
+	* `tool_caps`: Tool capabilities of the weapon uesd -- See "Weapon Definition"
+	* `dir`: Unit vector pointing from the source of the punch to the object
+	* `on_blast`: Respect entity `on_blast` damage callback
 * `shooter.fire_weapon(player, itemstack, spec)`: Adds a 'round' with `spec` to the processing que
 * `shooter.blast(pos, radius, fleshy, distance, user)`: Create explosion at `pos`
 	* `radius`: Blast radius in nodes
@@ -156,7 +162,7 @@ Used by `shooter.register_weapon`
 			-- `name`: Name of the weapon item, eg. `shooter_guns:rifle`
 			-- `user`: Name of the player that fired the weapon
 			-- `origin`: Initial starting position of the shot
-		-- `dir`: Direction of the virtual shot before impact
+		-- `dir`: Unit vector direction of the virtual shot before impact
 	end,
 	spec = {
 		-- Weapon specifications

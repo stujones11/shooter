@@ -160,6 +160,20 @@ shooter.play_node_sound = function(node, pos)
 	end
 end
 
+shooter.is_valid_object = function(object)
+	if object then
+		if object:is_player() == true then
+			return config.allow_players
+		end
+		if config.allow_entities == true then
+			local luaentity = object:get_luaentity()
+			if luaentity then
+				return luaentity.name ~= "__builtin:item"
+			end
+		end
+	end
+end
+
 shooter.punch_node = function(pos, spec)
 	local node = minetest.get_node(pos)
 	if not node then
@@ -185,23 +199,24 @@ shooter.punch_node = function(pos, spec)
 						shooter.spawn_particles(pos, {texture=item.tiles[1]})
 					end
 				end
-				break
+				return true
 			end
 		end
 	end
 end
 
-shooter.is_valid_object = function(object)
-	if object then
-		if object:is_player() == true then
-			return config.allow_players
+shooter.punch_object = function(object, tool_caps, dir, on_blast)
+	local do_damage = true
+	if on_blast then
+		local ent = object:get_luaentity()
+		local def = minetest.registered_entities[ent.name]
+		if def.on_blast then
+			do_damage = def.on_blast(ent, tool_caps.fleshy)
 		end
-		if config.allow_entities == true then
-			local luaentity = object:get_luaentity()
-			if luaentity then
-				return luaentity.name ~= "__builtin:item"
-			end
-		end
+	end
+	if do_damage then
+		object:punch(object, nil, tool_caps, dir)
+		return true
 	end
 end
 
@@ -217,15 +232,12 @@ local function process_hit(pointed_thing, spec, dir)
 		shooter.punch_node(pos, spec)
 	elseif pointed_thing.type == "object" then
 		local object = pointed_thing.ref
-		if shooter.is_valid_object(object) == true then
-			local player = minetest.get_player_by_name(spec.user)
-			if player then
-				object:punch(player, nil, spec.tool_caps, dir)
-				local pos = pointed_thing.intersection_point or object:get_pos()
-				local groups = object:get_armor_groups() or {}
-				if groups.fleshy then
-					shooter.spawn_particles(pos, spec.particles)
-				end
+		if shooter.is_valid_object(object) and
+				shooter.punch_object(object, spec.tool_caps, dir) then
+			local pos = pointed_thing.intersection_point or object:get_pos()
+			local groups = object:get_armor_groups() or {}
+			if groups.fleshy then
+				shooter.spawn_particles(pos, spec.particles)
 			end
 		end
 	end
@@ -364,11 +376,12 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1
 				local blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
-				if minetest.line_of_sight(obj_pos, blast_pos, 1) then
-					obj:punch(user, 1.0, {
+				if shooter.is_valid_object(obj) and
+						minetest.line_of_sight(obj_pos, blast_pos, 1) then
+					shooter.punch_object(obj, {
 						full_punch_interval = 1.0,
 						damage_groups = {fleshy=damage},
-					})
+					}, nil, true)
 				end
 			end
 		end
