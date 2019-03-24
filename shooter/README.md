@@ -155,6 +155,11 @@ Used by `shooter.register_weapon`
 		description = "My Awesome Gun (Unloaded)",
 		inventory_image = "my_awesome_gun_unloaded.png",
 	},
+	on_use = function(itemstack, user, pointed_thing)
+		-- Called before the built-in tool `one_use` handler
+		-- Should return a valid `ItemStack` or `nil` to cancel the shot
+		return itemstack
+	end,
 	on_hit = function(pointed_thing, spec, dir)
 		-- May be used for arbitary shot effects like knock-back, etc.
 		-- Return `true` to override built-in damage effects

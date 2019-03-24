@@ -59,7 +59,6 @@ local config = shooter.config
 local server_step = minetest.settings:get("dedicated_server_step")
 
 shooter.register_weapon = function(name, def)
-	shooter.registered_weapons[name] = def
 	-- Fix definition table
 	def.sounds = def.sounds or {}
 	def.sounds.reload = def.sounds.reload or "shooter_reload"
@@ -73,6 +72,7 @@ shooter.register_weapon = function(name, def)
 		description = def.description.." (unloaded)",
 		inventory_image = def.inventory_image,
 	}
+	shooter.registered_weapons[name] = table.copy(def)
 	-- Register loaded item tool
 	minetest.register_tool(name.."_loaded", {
 		description = def.description,
@@ -81,11 +81,13 @@ shooter.register_weapon = function(name, def)
 			if type(def.on_use) == "function" then
 				itemstack = def.on_use(itemstack, user, pointed_thing)
 			end
-			local spec = table.copy(def.spec)
-			if shooter.fire_weapon(user, itemstack, spec) then
-				itemstack:add_wear(def.spec.wear)
-				if itemstack:get_count() == 0 then
-					itemstack:replace(def.unloaded_item.name)
+			if itemstack then
+				local spec = table.copy(def.spec)
+				if shooter.fire_weapon(user, itemstack, spec) then
+					itemstack:add_wear(def.spec.wear)
+					if itemstack:get_count() == 0 then
+						itemstack:replace(def.unloaded_item.name)
+					end
 				end
 			end
 			return itemstack
@@ -175,6 +177,9 @@ shooter.is_valid_object = function(object)
 end
 
 shooter.punch_node = function(pos, spec)
+	if config.enable_protection and minetest.is_protected(pos, spec.user) then
+		return
+	end
 	local node = minetest.get_node(pos)
 	if not node then
 		return
@@ -182,11 +187,6 @@ shooter.punch_node = function(pos, spec)
 	local item = minetest.registered_items[node.name]
 	if not item then
 		return
-	end
-	if config.enable_protection then
-		if minetest.is_protected(pos, spec.user) then
-			return
-		end
 	end
 	if item.groups then
 		for k, v in pairs(spec.groups) do
