@@ -15,7 +15,7 @@ shooter_camera_height (Camera height used for raycasting) float 1.5
 
 [shooter_crossbow]
 
-shooter_crossbow_uses (Number of crossbow uses) int 5
+shooter_crossbow_uses (Number of crossbow uses) int 50
 shooter_arrow_lifetime (Arrow exipiry time in seconds) int 180
 shooter_arrow_fleshy (Arrow 'fleshy' damage level) float 2
 shooter_arrow_object_attach (Experimental, attach arrows to objects when hit) bool false

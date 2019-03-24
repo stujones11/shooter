@@ -121,18 +121,19 @@ API Documentation
 * `shooter.play_node_sound(node, pos)`: Plays the registered 'dug' sound for the node at `pos`
 * `shooter.is_valid_object(object)`: Returns `true` if the object can be damaged
 * `shooter.punch_node(pos, spec)`: Punches the node at `pos` with the `spec` group capabilities
+	* Returns `true` if the node was destroyed
 * `shooter.punch_object(object, tool_caps, dir, on_blast)`: Punches the object
 	* Returns `true` if the object is damaged
-	* `object`: Object to punched, not checked for validity!
+	* `object`: Object to be punched, not checked for validity!
 	* `tool_caps`: Tool capabilities of the weapon uesd -- See "Weapon Definition"
-	* `dir`: Unit vector pointing from the source of the punch to the object
+	* `dir`: Unit vector pointing from the source of the punch to the object, may be `nil`
 	* `on_blast`: Respect entity `on_blast` damage callback
 * `shooter.fire_weapon(player, itemstack, spec)`: Adds a 'round' with `spec` to the processing que
 * `shooter.blast(pos, radius, fleshy, distance, user)`: Create explosion at `pos`
 	* `radius`: Blast radius in nodes
 	* `fleshy`: Damage to inflict on fleshy objects: `(fleshy * 0.5 ^ distance) * 2`
 	* `distance`: Area of effect for objects
-	* `user`: A player reference, used for protection and object damage
+	* `user`: A player reference, used for protection
 * `shooter.get_shooting(name)`: Returns `true` if player `name` is holding the left mouse button or `nil`
 	* Requires `shooter_automatic_weapons` to be set `true`
 * `shooter.set_shooting(name, is_shooting)`: Sets the left mouse button status of player `name`
@@ -158,11 +159,11 @@ Used by `shooter.register_weapon`
 		-- May be used for arbitary shot effects like knock-back, etc.
 		-- Return `true` to override built-in damage effects
 		-- `pointed_thing`: Returned by `minetest.raycast()`
-		-- `spec`: Gunspec of the weapon used including addition fields
+		-- `spec`: Gunspec of the weapon used including some addition fields
 			-- `name`: Name of the weapon item, eg. `shooter_guns:rifle`
 			-- `user`: Name of the player that fired the weapon
 			-- `origin`: Initial starting position of the shot
-		-- `dir`: Unit vector direction of the virtual shot before impact
+		-- `dir`: Unit vector direction of the virtual shot
 	end,
 	spec = {
 		-- Weapon specifications
@@ -183,7 +184,7 @@ Used by `shooter.register_weapon`
 			crumbly = 3,
 			choppy = 3,
 			fleshy = 2,
-			oddly_breakable_by_hand=2
+			oddly_breakable_by_hand = 2
 		},
 		sounds = {
 			-- Sound files (defaults)
