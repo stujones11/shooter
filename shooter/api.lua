@@ -29,6 +29,7 @@ shooter.config = {
 	enable_protection = false,
 	enable_crafting = true,
 	explosion_texture = "shooter_hit.png",
+	node_drops = false,
 	allow_nodes = true,
 	allow_entities = false,
 	allow_players = true,
@@ -197,6 +198,16 @@ shooter.punch_node = function(pos, spec)
 				if item.tiles then
 					if item.tiles[1] then
 						shooter.spawn_particles(pos, {texture=item.tiles[1]})
+					end
+				end
+				if config.node_drops then
+					local object = minetest.add_item(pos, item)
+					if object then
+						object:set_velocity({
+							x = math.random(-1, 1),
+							y = 4,
+							z = math.random(-1, 1)
+						})
 					end
 				end
 				return true

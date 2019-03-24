@@ -74,6 +74,13 @@ Defaults to `false` in singleplayer mode
 
 `shooter_allow_players = true`
 
+### Node Drops
+
+Drops the node item when hit, requires `shooter_allow_nodes` to be `true`
+Currently excludes 'blasting'
+
+`shooter_node_drops = false`
+
 ### Round update time
 
 Maximum round 'step' processing interval, will inversely effect the long-range velocity of the virtual projectiles. This should always be greater than the dedicated server step time
