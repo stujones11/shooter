@@ -83,7 +83,8 @@ shooter.register_weapon = function(name, def)
 				itemstack = def.on_use(itemstack, user, pointed_thing)
 			end
 			if itemstack then
-				local spec = shooter.get_weapon_spec(nil, name)
+				local spec = shooter.get_weapon_spec(nil, name) or
+					table.copy(def.spec)
 				if shooter.fire_weapon(user, itemstack, spec) then
 					itemstack:add_wear(def.spec.wear)
 					if itemstack:get_count() == 0 then
@@ -120,10 +121,9 @@ end
 
 shooter.get_weapon_spec = function(_, name)
 	local def = shooter.registered_weapons[name]
-	if not def then
-		return nil
+	if def then
+		return table.copy(def.spec)
 	end
-	return table.copy(def.spec)
 end
 
 shooter.get_configuration = function(conf)
