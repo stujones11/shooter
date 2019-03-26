@@ -62,24 +62,25 @@ Particle texture used when a player or entity with the 'fleshy' armor group is h
 
 `shooter_allow_nodes = true`
 
-### Allow entities
-
-Defaults to `true` in singleplayer mode
-
-`shooter_allow_entities = false`
-
-### Allow players
-
-Defaults to `false` in singleplayer mode
-
-`shooter_allow_players = true`
-
 ### Node Drops
 
 Drops the node item when hit, requires `shooter_allow_nodes` to be `true`
 Currently excludes 'blasting'
 
 `shooter_node_drops = false`
+
+
+### Allow entity damage
+
+Defaults to `true` in singleplayer mode
+
+`shooter_allow_entities = false`
+
+### Allow player damage
+
+Defaults to `false` in singleplayer mode
+
+`shooter_allow_players = true`
 
 ### Round update time
 
@@ -123,7 +124,7 @@ API Documentation
 
 * `shooter.register_weapon(name, definition)`: Register a shooting weapon. -- See "Weapon Definition"
 * `shooter.get_weapon_spec(player, weaponname)`: Gets the spec for a particular weapon
-	* Override to add support for per-player specs.
+	* Override this function to add support for per-player specs, for example
 * `shooter.get_configuration(config)`: Loads matching config settings into a table ref `config`
 * `shooter.spawn_particles(pos, particles)`: Adds particles at the specified position
 	* `particles` is an optional table of overrides for `shooter.default_particles`
@@ -173,7 +174,7 @@ Used by `shooter.register_weapon`
 		-- May be used for arbitary shot effects like knock-back, etc.
 		-- Return `true` to override built-in damage effects
 		-- `pointed_thing`: Returned by `minetest.raycast()`
-		-- `spec`: Gunspec of the weapon used including some addition fields
+		-- `spec`: Gunspec of the weapon used including some additional fields
 			-- `name`: Name of the weapon item, eg. `shooter_guns:rifle`
 			-- `user`: Name of the player that fired the weapon
 			-- `origin`: Initial starting position of the shot
@@ -198,7 +199,7 @@ Used by `shooter.register_weapon`
 			crumbly = 3,
 			choppy = 3,
 			fleshy = 2,
-			oddly_breakable_by_hand = 2
+			oddly_breakable_by_hand = 2,
 		},
 		sounds = {
 			-- Sound files (defaults)
