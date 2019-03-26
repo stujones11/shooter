@@ -146,16 +146,14 @@ shooter.spawn_particles = function(pos, particles)
 	if not config.enable_particle_fx == true or particles.amount == 0 then
 		return
 	end
-	local copy = function(v)
-		return type(v) == "table" and table.copy(v) or v
-	end
-	local p = {}
 	for k, v in pairs(shooter.default_particles) do
-		p[k] = particles[k] and copy(particles[k]) or copy(v)
+		if not particles[k] then
+			particles[k] = type(v) == "table" and table.copy(v) or v
+		end
 	end
-	p.minpos = vector.subtract(pos, p.minpos)
-	p.maxpos = vector.add(pos, p.maxpos)
-	minetest.add_particlespawner(p)
+	particles.minpos = vector.subtract(pos, particles.minpos)
+	particles.maxpos = vector.add(pos, particles.maxpos)
+	minetest.add_particlespawner(particles)
 end
 
 shooter.play_node_sound = function(node, pos)
