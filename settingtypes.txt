@@ -11,7 +11,6 @@ shooter_allow_nodes (Allow node destruction) bool true
 shooter_allow_entities (Allow damage to active objects in multiplayer mode) bool false
 shooter_allow_players (Allow damage to players in multiplayer mode) bool true
 shooter_rounds_update_time (Round update time, should be >= dedicated server step) float 0.4
-shooter_camera_height (Camera height used for raycasting) float 1.5
 
 [shooter_crossbow]
 

@@ -34,7 +34,6 @@ shooter.config = {
 	allow_entities = false,
 	allow_players = true,
 	rounds_update_time = 0.4,
-	camera_height = 1.5,
 }
 
 shooter.default_particles = {
@@ -364,7 +363,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 	if not dir or not pos then
 		return
 	end
-	pos.y = pos.y + config.camera_height
+	pos.y = pos.y + player:get_properties().eye_height
 	spec.origin = v3d.add(pos, dir)
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval

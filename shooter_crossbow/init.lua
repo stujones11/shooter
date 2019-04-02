@@ -225,7 +225,7 @@ for _, color in pairs(dye_basecolors) do
 			local dir = user:get_look_dir()
 			local yaw = user:get_look_horizontal()
 			if pos and dir and yaw then
-				pos.y = pos.y + shooter.config.camera_height
+				pos.y = pos.y + user:get_properties().eye_height
 				local obj = minetest.add_entity(pos,
 					"shooter_crossbow:arrow_entity")
 				local ent = nil

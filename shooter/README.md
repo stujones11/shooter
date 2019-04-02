@@ -88,12 +88,6 @@ Maximum round 'step' processing interval, will inversely effect the long-range v
 
 `shooter_rounds_update_time = 0.4`
 
-### Camera Height
-
-Player eye offset used for rayasting and particle effects
-
-`shooter_camera_height = 1.5`
-
 API Documentation
 -----------------
 

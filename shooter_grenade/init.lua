@@ -77,7 +77,7 @@ minetest.register_tool("shooter_grenade:grenade", {
 		local dir = user:get_look_dir()
 		local yaw = user:get_look_horizontal()
 		if pos and dir then
-			pos.y = pos.y + shooter.config.camera_height
+			pos.y = pos.y + user:get_properties().eye_height
 			local obj = minetest.add_entity(pos, "shooter_grenade:grenade_entity")
 			if obj then
 				minetest.sound_play("shooter_throw", {object=obj})
