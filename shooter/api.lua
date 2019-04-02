@@ -368,14 +368,16 @@ local function fire_weapon(player, itemstack, spec, extended)
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	minetest.sound_play(spec.sound, {object=player})
+	local speed = spec.step / shooter.config.rounds_update_time
+	local time = spec.range / speed
 	local directions = get_directions(dir, spec)
 	for _, d in pairs(directions) do
 		if spec.bullet_image then
 			minetest.add_particle({
 				pos = pos,
-				velocity = v3d.multiply(d, 30),
+				velocity = v3d.multiply(d, speed),
 				acceleration = {x=0, y=0, z=0},
-				expirationtime = 0.5,
+				expirationtime = time,
 				size = 0.25,
 				texture = spec.bullet_image,
 			})
