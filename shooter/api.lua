@@ -34,6 +34,7 @@ shooter.config = {
 	allow_entities = false,
 	allow_players = true,
 	rounds_update_time = 0.4,
+	damage_multiplier = 1,
 }
 
 shooter.default_particles = {
@@ -230,16 +231,21 @@ end
 
 shooter.punch_object = function(object, tool_caps, dir, on_blast)
 	local do_damage = true
+	local groups = tool_caps.damage_groups or {}
 	if on_blast and not object:is_player() then
 		local ent = object:get_luaentity()
 		if ent then
 			local def = minetest.registered_entities[ent.name] or {}
-			if def.on_blast then
-				do_damage = def.on_blast(ent, tool_caps.fleshy)
+			if def.on_blast and groups.fleshy then
+				do_damage = def.on_blast(ent, groups.fleshy *
+					config.damage_multiplier)
 			end
 		end
 	end
 	if do_damage then
+		for k, v in pairs(groups) do
+			tool_caps.damage_groups[k] = v * config.damage_multiplier
+		end
 		object:punch(object, nil, tool_caps, dir)
 		return true
 	end
@@ -470,7 +476,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 		if shooter.is_valid_object(obj) then
 			local obj_pos = obj:get_pos()
 			local dist = v3d.distance(obj_pos, pos)
-			local damage = (fleshy * 0.5 ^ dist) * 2
+			local damage = (fleshy * 0.5 ^ dist) * 2 * config.damage_multiplier
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1
 				local blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}

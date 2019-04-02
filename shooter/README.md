@@ -88,6 +88,12 @@ Maximum round 'step' processing interval, will inversely effect the long-range v
 
 `shooter_rounds_update_time = 0.4`
 
+### Entity damage coefficient
+
+May be used to globaly increase or decrease damage done to entities/mobs
+
+`shooter_damage_multiplier = 1`
+
 API Documentation
 -----------------
 
