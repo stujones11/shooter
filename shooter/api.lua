@@ -58,6 +58,7 @@ local shots = {}
 local shooting = {}
 local config = shooter.config
 local server_step = minetest.settings:get("dedicated_server_step")
+local v3d = vector
 
 shooter.register_weapon = function(name, def)
 	-- Fix definition table
@@ -151,8 +152,8 @@ shooter.spawn_particles = function(pos, particles)
 			particles[k] = type(v) == "table" and table.copy(v) or v
 		end
 	end
-	particles.minpos = vector.subtract(pos, particles.minpos)
-	particles.maxpos = vector.add(pos, particles.maxpos)
+	particles.minpos = v3d.subtract(pos, particles.minpos)
+	particles.maxpos = v3d.add(pos, particles.maxpos)
 	minetest.add_particlespawner(particles)
 end
 
@@ -268,7 +269,7 @@ local function process_round(round)
 		return
 	end
 	local p1 = round.pos
-	local p2 = vector.add(p1, vector.multiply(round.dir, round.spec.step))
+	local p2 = v3d.add(p1, v3d.multiply(round.dir, round.spec.step))
 	local ray = minetest.raycast(p1, p2, true, true)
 	local pointed_thing = ray:next() or {type="nothing"}
 	if pointed_thing.type ~= "nothing" then
@@ -290,14 +291,14 @@ local function fire_weapon(player, itemstack, spec, extended)
 		return
 	end
 	pos.y = pos.y + config.camera_height
-	spec.origin = vector.add(pos, dir)
+	spec.origin = v3d.add(pos, dir)
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	minetest.sound_play(spec.sound, {object=player})
 	if spec.bullet_image then
 		minetest.add_particle({
 			pos = pos,
-			velocity = vector.multiply(dir, 30),
+			velocity = v3d.multiply(dir, 30),
 			acceleration = {x=0, y=0, z=0},
 			expirationtime = 0.5,
 			size = 0.25,
@@ -306,7 +307,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 	end
 	process_round({
 		spec = spec,
-		pos = vector.new(spec.origin),
+		pos = v3d.new(spec.origin),
 		dir = dir,
 		dist = 0,
 	})
@@ -353,10 +354,10 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 	if not user then
 		return
 	end
-	pos = vector.round(pos)
+	pos = v3d.round(pos)
 	local name = user:get_player_name()
-	local p1 = vector.subtract(pos, radius)
-	local p2 = vector.add(pos, radius)
+	local p1 = v3d.subtract(pos, radius)
+	local p2 = v3d.add(pos, radius)
 	minetest.sound_play("shooter_explode", {
 		pos = pos,
 		gain = 10,
@@ -390,7 +391,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 	for _,obj in ipairs(objects) do
 		if shooter.is_valid_object(obj) then
 			local obj_pos = obj:get_pos()
-			local dist = vector.distance(obj_pos, pos)
+			local dist = v3d.distance(obj_pos, pos)
 			local damage = (fleshy * 0.5 ^ dist) * 2
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1
