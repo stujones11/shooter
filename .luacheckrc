@@ -2,7 +2,6 @@ allow_defined_top = true
 
 read_globals = {
 	"ItemStack",
-	"vector",
 	"VoxelArea",
 	"VoxelManip",
 	"PseudoRandom",
@@ -11,6 +10,7 @@ read_globals = {
 }
 
 globals = {
+	"vector",
 	"minetest",
 }
 

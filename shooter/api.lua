@@ -59,6 +59,11 @@ local shooting = {}
 local config = shooter.config
 local server_step = minetest.settings:get("dedicated_server_step")
 local v3d = vector
+local PI = math.pi
+local sin = math.sin
+local cos = math.cos
+local sqrt = math.sqrt
+local phi = (math.sqrt(5) + 1) / 2 -- Golden ratio
 
 shooter.register_weapon = function(name, def)
 	-- Fix definition table
@@ -240,6 +245,74 @@ shooter.punch_object = function(object, tool_caps, dir, on_blast)
 	end
 end
 
+local function matrix_from_quat(q)
+	local m = {{}, {}, {}}
+	m[1][1] = 1 - 2 * q.y * q.y - 2 * q.z * q.z
+	m[1][2] = 2 * q.x * q.y + 2 * q.z * q.w
+	m[1][3] = 2 * q.x * q.z - 2 * q.y * q.w
+	m[2][1] = 2 * q.x * q.y - 2 * q.z * q.w
+	m[2][2] = 1 - 2 * q.x * q.x - 2 * q.z * q.z
+	m[2][3] = 2 * q.z * q.y + 2 * q.x * q.w
+	m[3][1] = 2 * q.x * q.z + 2 * q.y * q.w
+	m[3][2] = 2 * q.z * q.y - 2 * q.x * q.w
+	m[3][3] = 1 - 2 * q.x * q.x - 2 * q.y * q.y
+	return m
+end
+
+local function quat_from_angle_axis(angle, axis)
+	local t = angle / 2
+	local s = sin(t)
+	return {
+		x = s * axis.x,
+		y = s * axis.y,
+		z = s * axis.z,
+		w = cos(t),
+	}
+end
+
+v3d.cross = function(v1, v2)
+	return {
+		x = v1.y * v2.z - v2.y * v1.z,
+		y = v1.z * v2.x - v2.z * v1.x,
+		z = v1.x * v2.y - v2.x * v1.y,
+	}
+end
+
+v3d.mult_matrix = function(v, m)
+	return {
+		x = m[1][1] * v.x + m[1][2] * v.y + m[1][3] * v.z,
+		y = m[2][1] * v.x + m[2][2] * v.y + m[2][3] * v.z,
+		z = m[3][1] * v.x + m[3][2] * v.y + m[3][3] * v.z,
+	}
+end
+
+v3d.rotate = function(v, angle, axis)
+	local q = quat_from_angle_axis(angle, axis)
+	local m = matrix_from_quat(q)
+	return v3d.mult_matrix(v, m)
+end
+
+local function get_directions(dir, spec)
+	local directions = {dir}
+	local n = spec.shots or 1
+	if n > 1 then
+		local right = v3d.normalize(v3d.cross(dir, {x=0, y=1, z=0}))
+		local up = v3d.normalize(v3d.cross(dir, right))
+		local s = spec.spread or 10
+		s = s * 0.017453 -- Convert to radians
+		for k = 1, n - 1 do
+			-- Sunflower seed arrangement
+			local r = sqrt(k - 0.5) / sqrt(n - 0.5)
+			local theta = 2 * PI * k / (phi * phi)
+			local x = r * cos(theta) * s
+			local y = r * sin(theta) * s
+			local d = v3d.rotate(dir, y, up)
+			directions[k + 1] = v3d.rotate(d, x, right)
+		end
+	end
+	return directions
+end
+
 local function process_hit(pointed_thing, spec, dir)
 	local def = minetest.registered_items[spec.name] or {}
 	if type(def.on_hit) == "function" then
@@ -295,22 +368,25 @@ local function fire_weapon(player, itemstack, spec, extended)
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	minetest.sound_play(spec.sound, {object=player})
-	if spec.bullet_image then
-		minetest.add_particle({
-			pos = pos,
-			velocity = v3d.multiply(dir, 30),
-			acceleration = {x=0, y=0, z=0},
-			expirationtime = 0.5,
-			size = 0.25,
-			texture = spec.bullet_image,
+	local directions = get_directions(dir, spec)
+	for _, d in pairs(directions) do
+		if spec.bullet_image then
+			minetest.add_particle({
+				pos = pos,
+				velocity = v3d.multiply(d, 30),
+				acceleration = {x=0, y=0, z=0},
+				expirationtime = 0.5,
+				size = 0.25,
+				texture = spec.bullet_image,
+			})
+		end
+		process_round({
+			spec = spec,
+			pos = v3d.new(spec.origin),
+			dir = d,
+			dist = 0,
 		})
 	end
-	process_round({
-		spec = spec,
-		pos = v3d.new(spec.origin),
-		dir = dir,
-		dist = 0,
-	})
 	if extended then
 		itemstack:add_wear(spec.wear)
 		if itemstack:get_count() == 0 then

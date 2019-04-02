@@ -188,6 +188,11 @@ Used by `shooter.register_weapon`
 			-- Range (in nodes) of each shot
 		step = 30,
 			-- Distance per `shooter_rounds_update_time`
+		shots = 1,
+			-- Number of shots fired per `round`
+		spread = 10,
+			-- Spread of shots in degrees if `shots` > 1
+			-- Uses a sunflower seed arrangement for even distributuion
 		tool_caps = {
 			-- Tool capabilities, used for object/player damage
 			full_punch_interval = 1.0,
