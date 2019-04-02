@@ -66,20 +66,23 @@ local sqrt = math.sqrt
 local phi = (math.sqrt(5) + 1) / 2 -- Golden ratio
 
 shooter.register_weapon = function(name, def)
+	-- Backwards compatibility
+	if not def.spec.sounds then
+		def.spec.sounds = def.sounds or {}
+	end
+	if not def.spec.sounds.shot and def.spec.sound then
+		def.spec.sounds.shot = def.spec.sound
+	end
 	-- Fix definition table
-	def.sounds = def.sounds or {}
-	def.sounds.reload = def.sounds.reload or "shooter_reload"
-	def.sounds.fail_shot = def.sounds.fail_shot or "shooter_click"
-	def.reload_item = def.reload_item or "shooter:ammo"
+	def.spec.reload_item = def.reload_item or "shooter:ammo"
 	def.spec.tool_caps.full_punch_interval = math.max(server_step,
 		def.spec.tool_caps.full_punch_interval)
 	def.spec.wear = math.ceil(65535 / def.spec.rounds)
-	def.spec.unloaded_item = name
 	def.unloaded_item = def.unloaded_item or {
-		name = name,
 		description = def.description.." (unloaded)",
 		inventory_image = def.inventory_image,
 	}
+	def.unloaded_item.name = name
 	shooter.registered_weapons[name] = table.copy(def)
 	-- Register loaded item tool
 	minetest.register_tool(name.."_loaded", {
@@ -101,6 +104,7 @@ shooter.register_weapon = function(name, def)
 			end
 			return itemstack
 		end,
+		unloaded_item = def.unloaded_item,
 		on_hit = def.on_hit,
 		groups = {not_in_creative_inventory=1},
 	})
@@ -114,11 +118,13 @@ shooter.register_weapon = function(name, def)
 			if inv then
 				local stack = def.reload_item
 				if inv:contains_item("main", stack) then
-					minetest.sound_play(def.sounds.reload, {object=user})
+					local sound = def.spec.sounds.reload or "shooter_reload"
+					minetest.sound_play(sound, {object=user})
 					inv:remove_item("main", stack)
 					itemstack:replace(name.."_loaded 1 1")
 				else
-					minetest.sound_play(def.sounds.fail_shot, {object=user})
+					local sound = def.spec.sounds.fail_shot or "shooter_click"
+					minetest.sound_play(sound, {object=user})
 				end
 			end
 			return itemstack
@@ -373,8 +379,9 @@ local function fire_weapon(player, itemstack, spec, extended)
 	spec.origin = v3d.add(pos, dir)
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
-	minetest.sound_play(spec.sound, {object=player})
-	local speed = spec.step / shooter.config.rounds_update_time
+	local sound = spec.sounds.shot or "shooter_pistol"
+	minetest.sound_play(sound, {object=player})
+	local speed = spec.step / (config.rounds_update_time * 2)
 	local time = spec.range / speed
 	local directions = get_directions(dir, spec)
 	for _, d in pairs(directions) do
@@ -398,7 +405,10 @@ local function fire_weapon(player, itemstack, spec, extended)
 	if extended then
 		itemstack:add_wear(spec.wear)
 		if itemstack:get_count() == 0 then
-			itemstack = spec.unloaded_item
+			local def = shooter.registered_weapons[spec.name] or {}
+			if def.unloaded_item then
+				itemstack = def.unloaded_item.name or ""
+			end
 			player:set_wielded_item(itemstack)
 			return
 		end
