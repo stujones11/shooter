@@ -76,6 +76,7 @@ shooter.register_weapon = function(name, def)
 	def.spec.wear = math.ceil(65535 / def.spec.rounds)
 	def.spec.unloaded_item = name
 	def.unloaded_item = def.unloaded_item or {
+		name = name,
 		description = def.description.." (unloaded)",
 		inventory_image = def.inventory_image,
 	}
