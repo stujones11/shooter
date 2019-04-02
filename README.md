@@ -3,7 +3,7 @@
 
 ![screenshot](https://raw.githubusercontent.com/stujones11/shooter/master/screenshot.png)
 
-**Mod Version:** 0.6.0
+**Mod Version:** 0.6.1
 
 **Minetest Version:** 5.0.0 (engine & game)
 
