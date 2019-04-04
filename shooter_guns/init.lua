@@ -87,7 +87,7 @@ shooter.register_weapon("shooter_guns:machine_gun", {
 	inventory_image = "shooter_smgun.png",
 	spec = {
 		automatic = true,
-		rounds = 10,
+		rounds = 20,
 		range = 160,
 		step = 20,
 		tool_caps = {full_punch_interval=0.1, damage_groups={fleshy=2}},

@@ -405,7 +405,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 	if extended then
 		itemstack:add_wear(spec.wear)
 		if itemstack:get_count() == 0 then
-			local def = shooter.registered_weapons[spec.name] or {}
+			local def = minetest.registered_items[spec.name] or {}
 			if def.unloaded_item then
 				itemstack = def.unloaded_item.name or ""
 			end
