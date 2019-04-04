@@ -376,7 +376,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 		return
 	end
 	pos.y = pos.y + player:get_properties().eye_height
-	spec.origin = v3d.add(pos, dir)
+	spec.origin = v3d.add(pos, v3d.multiply(dir, 1.5))
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	local sound = spec.sounds.shot or "shooter_pistol"
