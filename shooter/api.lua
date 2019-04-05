@@ -56,9 +56,9 @@ shooter.default_particles = {
 
 local shots = {}
 local shooting = {}
-local config = shooter.config
+local config = table.copy(shooter.config)
 local server_step = minetest.settings:get("dedicated_server_step")
-local v3d = vector
+local v3d = table.copy(vector)
 local PI = math.pi
 local sin = math.sin
 local cos = math.cos
