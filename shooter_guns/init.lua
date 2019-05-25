@@ -136,7 +136,7 @@ if shooter.config.enable_crafting == true then
 	minetest.register_craft({
 		output = "shooter_guns:machine_gun 1 65535",
 		recipe = {
-			{"shooter_guns:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
 			{"", "default:bronze_ingot", "default:mese_crystal"},
 			{"", "default:bronze_ingot", ""},
 		},
