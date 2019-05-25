@@ -116,7 +116,7 @@ shooter.register_weapon = function(name, def)
 		on_use = function(itemstack, user)
 			local inv = user:get_inventory()
 			if inv then
-				local stack = def.reload_item
+				local stack = def.spec.reload_item
 				if inv:contains_item("main", stack) then
 					local sound = def.spec.sounds.reload or "shooter_reload"
 					minetest.sound_play(sound, {object=user})
