@@ -96,7 +96,7 @@ shooter.register_weapon = function(name, def)
 				local spec = shooter.get_weapon_spec(nil, name) or
 					table.copy(def.spec)
 				if shooter.fire_weapon(user, itemstack, spec) then
-					itemstack:add_wear(def.spec.wear)
+					itemstack:add_wear(spec.wear)
 					if itemstack:get_count() == 0 then
 						itemstack:replace(def.unloaded_item.name)
 					end
