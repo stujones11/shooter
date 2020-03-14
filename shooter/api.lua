@@ -93,9 +93,8 @@ shooter.register_weapon = function(name, def)
 				itemstack = def.on_use(itemstack, user, pointed_thing)
 			end
 			if itemstack then
-				local spec = shooter.get_weapon_spec(nil, name) or
-					table.copy(def.spec)
-				if shooter.fire_weapon(user, itemstack, spec) then
+				local spec = shooter.get_weapon_spec(user, name)
+				if spec and shooter.fire_weapon(user, itemstack, spec) then
 					itemstack:add_wear(def.spec.wear)
 					if itemstack:get_count() == 0 then
 						itemstack:replace(def.unloaded_item.name)
