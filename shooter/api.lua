@@ -234,7 +234,11 @@ shooter.punch_node = function(pos, spec)
 	end
 end
 
-shooter.punch_object = function(object, tool_caps, dir, on_blast)
+shooter.punch_object = function(object, tool_caps, dir, on_blast, puncher)
+	if type(puncher) == "string" then
+		puncher = minetest.get_player_by_name(puncher)
+	end
+
 	local do_damage = true
 	local groups = tool_caps.damage_groups or {}
 	if on_blast and not object:is_player() then
@@ -251,7 +255,7 @@ shooter.punch_object = function(object, tool_caps, dir, on_blast)
 		for k, v in pairs(groups) do
 			tool_caps.damage_groups[k] = v * config.damage_multiplier
 		end
-		object:punch(object, nil, tool_caps, dir)
+		object:punch(puncher, nil, tool_caps, dir)
 		return true
 	end
 end
@@ -337,7 +341,7 @@ local function process_hit(pointed_thing, spec, dir)
 	elseif pointed_thing.type == "object" then
 		local object = pointed_thing.ref
 		if shooter.is_valid_object(object) and
-				shooter.punch_object(object, spec.tool_caps, dir) then
+				shooter.punch_object(object, spec.tool_caps, dir, nil, spec.user) then
 			local pos = pointed_thing.intersection_point or object:get_pos()
 			local groups = object:get_armor_groups() or {}
 			if groups.fleshy then
@@ -494,7 +498,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 					shooter.punch_object(obj, {
 						full_punch_interval = 1.0,
 						damage_groups = {fleshy=damage},
-					}, nil, true)
+					}, nil, true, user)
 				end
 			end
 		end
