@@ -63,12 +63,12 @@ shooter.register_weapon("shooter_guns:shotgun", {
 	description = "Shotgun",
 	inventory_image = "shooter_shotgun.png",
 	spec = {
-		rounds = 50,
+		rounds = 12,
 		range = 30,
 		step = 15,
 		shots = 15,
 		spread = 10,
-		tool_caps = {full_punch_interval=0.5, damage_groups={fleshy=2}},
+		tool_caps = {full_punch_interval=1, damage_groups={fleshy=2}},
 		groups = {snappy=3, fleshy=3, oddly_breakable_by_hand=3},
 		sounds = {
 			shot = "shooter_shotgun",
