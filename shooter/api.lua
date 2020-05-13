@@ -421,7 +421,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 		return
 	end
 	minetest.after(interval, function(...)
-		if shooting[spec.user] then
+		if shooting[spec.user] and player:get_wield_index() == spec.wield_idx then
 			local arg = {...}
 			fire_weapon(arg[1], arg[2], arg[3], true)
 		end
@@ -443,6 +443,7 @@ shooter.fire_weapon = function(player, itemstack, spec)
 	end
 	spec.user = name
 	spec.name = itemstack:get_name()
+	spec.wield_idx = player:get_wield_index()
 	fire_weapon(player, itemstack, spec)
 	return true
 end
