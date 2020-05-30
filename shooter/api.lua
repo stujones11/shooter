@@ -214,9 +214,9 @@ shooter.punch_node = function(pos, spec)
 				minetest.remove_node(pos)
 				shooter.play_node_sound(node, pos)
 				if item.tiles then
-					if item.tiles[1] then
-						shooter.spawn_particles(pos, {texture=item.tiles[1]})
-					end
+					local texture = item.tiles[1]
+					texture = (type(texture) == "table") and texture.name or texture
+					shooter.spawn_particles(pos, {texture=texture})
 				end
 				if config.node_drops then
 					local object = minetest.add_item(pos, item)
