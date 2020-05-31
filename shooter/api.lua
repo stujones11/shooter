@@ -367,6 +367,8 @@ local function process_round(round)
 			pointed_thing = ray:next()
 		end
 
+		if not pointed_thing then return end
+
 		return process_hit(pointed_thing, round.spec, round.dir)
 	end
 	round.pos = p2
