@@ -359,8 +359,14 @@ local function process_round(round)
 	local p1 = round.pos
 	local p2 = v3d.add(p1, v3d.multiply(round.dir, round.spec.step))
 	local ray = minetest.raycast(p1, p2, true, true)
-	local pointed_thing = ray:next() or {type="nothing"}
-	if pointed_thing.type ~= "nothing" then
+	local pointed_thing = ray:next()
+	if pointed_thing then
+		-- Iterate over ray again if pointed object == shooter
+		local ref = pointed_thing.ref
+		if ref and ref:is_player() and ref:get_player_name() == round.spec.user then
+			pointed_thing = ray:next()
+		end
+
 		return process_hit(pointed_thing, round.spec, round.dir)
 	end
 	round.pos = p2
@@ -379,7 +385,7 @@ local function fire_weapon(player, itemstack, spec, extended)
 		return
 	end
 	pos.y = pos.y + player:get_properties().eye_height
-	spec.origin = v3d.add(pos, v3d.multiply(dir, 1.5))
+	spec.origin = pos
 	local interval = spec.tool_caps.full_punch_interval
 	shots[spec.user] = minetest.get_us_time() / 1000000 + interval
 	local sound = spec.sounds.shot or "shooter_pistol"
