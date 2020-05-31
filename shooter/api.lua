@@ -367,9 +367,9 @@ local function process_round(round)
 			pointed_thing = ray:next()
 		end
 
-		if not pointed_thing then return end
-
-		return process_hit(pointed_thing, round.spec, round.dir)
+		if pointed_thing then
+			return process_hit(pointed_thing, round.spec, round.dir)
+		end
 	end
 	round.pos = p2
 	minetest.after(shooter.config.rounds_update_time, function(...)
