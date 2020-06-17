@@ -551,3 +551,7 @@ end
 shooter.set_shooting = function(name, is_shooting)
 	shooting[name] = is_shooting and true or nil
 end
+
+minetest.register_on_dieplayer(function(player)
+	shooting[player:get_player_name()] = nil
+end)

@@ -67,11 +67,10 @@ minetest.register_entity("shooter:turret_entity", {
 
 if shooter.config.automatic_weapons == true then
 	minetest.register_globalstep(function()
-		for _,player in pairs(minetest.get_connected_players()) do
+		for _, player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
-			if name then
-				shooter.set_shooting(name,
-					player:get_player_control().LMB == true)
+			if shooter.get_shooting(name) and not player:get_player_control().LMB then
+				shooter.set_shooting(name, nil)
 			end
 		end
 	end)
