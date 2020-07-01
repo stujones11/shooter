@@ -37,7 +37,7 @@ end
 
 config = shooter.get_configuration(config)
 
-local arrow_tool_caps = {damage_groups={fleshy=config.arrow_fleshy}}
+local arrow_tool_caps = {damage_groups={fleshy=config.arrow_fleshy, ranged=1, crossbow=1}}
 if minetest.global_exists("SHOOTER_ARROW_TOOL_CAPS") then
 	arrow_tool_caps = table.copy(SHOOTER_ARROW_TOOL_CAPS)
 end
