@@ -23,7 +23,12 @@ local function throw_hook(itemstack, user, vel)
 	local yaw = user:get_look_horizontal()
 	if pos and dir and yaw then
 		if not minetest.setting_getbool("creative_mode") then
+			local before = itemstack:get_wear()
 			itemstack:add_wear(65535 / 100)
+
+			if itemstack:get_wear() < before then
+				itemstack:set_wear(65535)
+			end
 		end
 		pos.y = pos.y + 1.5
 		local obj = minetest.add_entity(pos, "shooter_hook:hook")
